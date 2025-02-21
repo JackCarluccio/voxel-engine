@@ -30,7 +30,7 @@ FetchContent_MakeAvailable(glad)
 find_package(OpenGL REQUIRED)
 
 # Add the source files **before linking**
-add_executable(VoxelEngine src/main.cpp "include/shaderProgram.h" "src/shaderProgram.cpp" "include/VAO.h" "src/VAO.cpp" "include/VBO.h" "src/VBO.cpp" "include/EBO.h" "src/EBO.cpp")
+add_executable(VoxelEngine src/main.cpp "include/shaderProgram.h" "src/shaderProgram.cpp" "include/VAO.h" "src/VAO.cpp" "include/VBO.h" "src/VBO.cpp" "include/EBO.h" "src/EBO.cpp" "include/Mesh.h" "src/Mesh.cpp")
 
 # Include directories for GLFW and GLAD
 target_include_directories(VoxelEngine PRIVATE ${glfw_SOURCE_DIR}/include ${glad_SOURCE_DIR}/include)

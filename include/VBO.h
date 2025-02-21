@@ -1,10 +1,11 @@
 #pragma once
 
-#include<glad/glad.h>
+#include <vector>
+#include <glad/glad.h>
 
 class VBO {
 public:
-	VBO(const GLfloat* vertices, GLsizeiptr size);
+	VBO(const std::vector<GLfloat>& vertices);
 	~VBO();
 
 	void Bind();

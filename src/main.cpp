@@ -1,14 +1,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <vector>
 #include <iostream>
 
 #include "shaderProgram.h"
-#include "VAO.h"
-#include "VBO.h"
-#include "EBO.h"
+#include "Mesh.h"
 
 // Vertices coordinates
-static const GLfloat vertices[] = {
+const std::vector<GLfloat> vertices {
     -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower left corner
     0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower right corner
     0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // Upper corner
@@ -18,7 +17,7 @@ static const GLfloat vertices[] = {
 };
 
 // Indices for vertices order
-static const GLuint indices[] = {
+const std::vector<GLuint> indices {
     0, 3, 5, // Lower left triangle
     3, 2, 4, // Lower right triangle
     5, 4, 1 // Upper triangle
@@ -57,34 +56,17 @@ int main() {
         return -1;
     }
 
-	VAO vertexArrayObject;
-	vertexArrayObject.Bind();
-
-	VBO vertexBufferObject(vertices, sizeof(vertices));
-	EBO elementBufferObject(indices, sizeof(indices));
-
-	vertexArrayObject.LinkAttrib(vertexBufferObject, 0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
-
-	vertexArrayObject.Unbind();
-	vertexBufferObject.Unbind();
-	elementBufferObject.Unbind();
-
     // Create and use shader program
 	ShaderProgram shaderProgram("default.vert", "default.frag");
-	shaderProgram.Activate();
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    Mesh mesh(vertices, indices);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-		shaderProgram.Activate();
-		vertexArrayObject.Bind();
-
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, nullptr);
+		mesh.Draw(shaderProgram);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

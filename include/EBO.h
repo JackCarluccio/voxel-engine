@@ -1,10 +1,11 @@
 #pragma once
 
+#include <vector>
 #include <glad/glad.h>
 
 class EBO {
 public:
-	EBO(const GLuint* indices, GLsizeiptr size);
+	EBO(const std::vector<GLuint>& indices);
 	~EBO();
 
 	void Bind();
