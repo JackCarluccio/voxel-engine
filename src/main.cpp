@@ -5,11 +5,23 @@
 #include "shaderProgram.h"
 #include "VAO.h"
 #include "VBO.h"
+#include "EBO.h"
 
+// Vertices coordinates
 static const GLfloat vertices[] = {
-    0.0f, 0.5f, 0.0f,
-    0.5f, -0.5, 0.0f,
-    -0.5f, -0.5, 0.0f,
+    -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower left corner
+    0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower right corner
+    0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // Upper corner
+    -0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner left
+    0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner right
+    0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f // Inner down
+};
+
+// Indices for vertices order
+static const GLuint indices[] = {
+    0, 3, 5, // Lower left triangle
+    3, 2, 4, // Lower right triangle
+    5, 4, 1 // Upper triangle
 };
 
 
@@ -49,11 +61,13 @@ int main() {
 	vertexArrayObject.Bind();
 
 	VBO vertexBufferObject(vertices, sizeof(vertices));
+	EBO elementBufferObject(indices, sizeof(indices));
 
 	vertexArrayObject.LinkAttrib(vertexBufferObject, 0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
 
 	vertexArrayObject.Unbind();
 	vertexBufferObject.Unbind();
+	elementBufferObject.Unbind();
 
     // Create and use shader program
 	ShaderProgram shaderProgram("default.vert", "default.frag");
@@ -70,7 +84,7 @@ int main() {
 		shaderProgram.Activate();
 		vertexArrayObject.Bind();
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, nullptr);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

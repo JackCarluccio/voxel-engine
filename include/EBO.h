@@ -1,11 +1,11 @@
 #pragma once
 
-#include<glad/glad.h>
+#include <glad/glad.h>
 
-class VBO {
+class EBO {
 public:
-	VBO(const GLfloat* vertices, GLsizeiptr size);
-	~VBO();
+	EBO(const GLuint* indices, GLsizeiptr size);
+	~EBO();
 
 	void Bind();
 	void Unbind();

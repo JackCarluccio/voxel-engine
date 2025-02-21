@@ -1,12 +1,13 @@
 #include "VAO.h"
 
+// Constructor that generates a VAO ID
 VAO::VAO() {
 	glGenVertexArrays(1, &id);
 }
 
 
 VAO::~VAO() {
-	glDeleteVertexArrays(1, &id);
+	Delete();
 }
 
 // Links a VBO Attribute such as a position or color to the VAO
@@ -25,4 +26,9 @@ void VAO::Bind() {
 // Unbinds the VAO
 void VAO::Unbind() {
 	glBindVertexArray(0);
+}
+
+// Deletes the VAO
+void VAO::Delete() {
+	glDeleteVertexArrays(1, &id);
 }

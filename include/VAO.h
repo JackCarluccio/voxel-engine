@@ -11,6 +11,7 @@ public:
 	void Bind();
 	void Unbind();
 	void LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset);
+	void Delete();
 
 	GLuint GetId() const { return id; }
 
