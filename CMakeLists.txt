@@ -30,10 +30,12 @@ FetchContent_MakeAvailable(glad)
 find_package(OpenGL REQUIRED)
 
 # Add the source files **before linking**
-add_executable(VoxelEngine src/main.cpp)
+add_executable(VoxelEngine src/main.cpp "include/shaderProgram.h" "src/shaderProgram.cpp")
 
 # Include directories for GLFW and GLAD
 target_include_directories(VoxelEngine PRIVATE ${glfw_SOURCE_DIR}/include ${glad_SOURCE_DIR}/include)
 
 # Link OpenGL, GLFW, and GLAD to our executable
 target_link_libraries(VoxelEngine PRIVATE OpenGL::GL glfw glad)
+
+include_directories(${CMAKE_SOURCE_DIR}/include)
