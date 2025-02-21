@@ -3,8 +3,10 @@
 #include <iostream>
 
 #include "shaderProgram.h"
+#include "VAO.h"
+#include "VBO.h"
 
-static const GLfloat vertexData[] = {
+static const GLfloat vertices[] = {
     0.0f, 0.5f, 0.0f,
     0.5f, -0.5, 0.0f,
     -0.5f, -0.5, 0.0f,
@@ -43,14 +45,15 @@ int main() {
         return -1;
     }
 
-    GLuint vertexArray;
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
+	VAO vertexArrayObject;
+	vertexArrayObject.Bind();
 
-    GLuint vertexBuffer;
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
+	VBO vertexBufferObject(vertices, sizeof(vertices));
+
+	vertexArrayObject.LinkAttrib(vertexBufferObject, 0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
+
+	vertexArrayObject.Unbind();
+	vertexBufferObject.Unbind();
 
     // Create and use shader program
 	ShaderProgram shaderProgram("default.vert", "default.frag");
@@ -63,6 +66,9 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+		shaderProgram.Activate();
+		vertexArrayObject.Bind();
 
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 

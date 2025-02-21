@@ -6,7 +6,7 @@
 #include <sstream>
 #include <iostream>
 
-std::string ReadFile(const char* filename);
+std::string ReadFile(const std::string& filename);
 
 class ShaderProgram {
 public:
