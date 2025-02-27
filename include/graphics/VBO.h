@@ -3,6 +3,8 @@
 #include <vector>
 #include <glad/glad.h>
 
+namespace Graphics {
+
 class VBO {
 public:
 	VBO(const std::vector<GLfloat>& vertices);
@@ -17,3 +19,5 @@ public:
 private:
 	GLuint id;
 };
+
+}

@@ -2,9 +2,11 @@
 
 #include <vector>
 #include <glad/glad.h>
-#include "VAO.h"
-#include "VBO.h"
-#include "EBO.h"
+#include "graphics/VAO.h"
+#include "graphics/VBO.h"
+#include "graphics/EBO.h"
+
+namespace Graphics {
 
 class Mesh {
 public:
@@ -21,3 +23,5 @@ private:
 	const std::vector<GLfloat>& vertices;
 	const std::vector<GLuint>& indices;
 };
+
+}

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <glad/glad.h>
-#include "VBO.h"
+#include "graphics/VBO.h"
+
+namespace Graphics {
 
 class VAO {
 public:
@@ -18,3 +20,5 @@ public:
 private:
 	GLuint id;
 };
+
+}

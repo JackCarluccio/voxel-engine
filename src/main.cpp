@@ -6,8 +6,8 @@
 #include <vector>
 #include <iostream>
 
-#include "ShaderProgram.h"
-#include "Mesh.h"
+#include "graphics/ShaderProgram.h"
+#include "graphics/Mesh.h"
 
 // Vertices coordinates
 const std::vector<GLfloat> vertices {
@@ -28,7 +28,7 @@ const std::vector<GLuint> indices {
 
 float aspectRatio = 800.0f / 600.0f;
 
-glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 6.0f);
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -70,9 +70,9 @@ int main() {
     }
 
     // Create and use shader program
-	ShaderProgram shaderProgram("default.vert", "default.frag");
+	Graphics::ShaderProgram shaderProgram("default.vert", "default.frag");
 
-    Mesh mesh(vertices, indices);
+    Graphics::Mesh mesh(vertices, indices);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {

@@ -8,6 +8,8 @@
 
 std::string ReadFile(const std::string& filename);
 
+namespace Graphics {
+
 class ShaderProgram {
 public:
 	ShaderProgram(const std::string& vertexSourceFileName, const std::string& fragmentSourceFileName);
@@ -20,3 +22,5 @@ public:
 private:
 	GLuint id;
 };
+
+}

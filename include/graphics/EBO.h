@@ -3,6 +3,8 @@
 #include <vector>
 #include <glad/glad.h>
 
+namespace Graphics {
+
 class EBO {
 public:
 	EBO(const std::vector<GLuint>& indices);
@@ -17,3 +19,5 @@ public:
 private:
 	GLuint id;
 };
+
+}

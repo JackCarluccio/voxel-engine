@@ -40,11 +40,11 @@ find_package(OpenGL REQUIRED)
 # Add executable
 add_executable(VoxelEngine 
     src/main.cpp
-    "src/ShaderProgram.cpp"
-    src/VAO.cpp
-    src/VBO.cpp
-    src/EBO.cpp
-    src/Mesh.cpp
+    "src/graphics/ShaderProgram.cpp"
+    "src/graphics/VAO.cpp"
+    "src/graphics/VBO.cpp"
+    "src/graphics/EBO.cpp"
+    "src/graphics/Mesh.cpp"
 )
 
 # Include directories

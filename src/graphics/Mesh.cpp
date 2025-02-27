@@ -1,6 +1,6 @@
-#include "Mesh.h"
+#include "graphics/Mesh.h"
 
-Mesh::Mesh(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices): 
+Graphics::Mesh::Mesh(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices): 
 	vertexArrayObject(), vertexBufferObject(vertices), elementBufferObject(indices), vertices(vertices), indices(indices)
 {
 	vertexArrayObject.Bind();
@@ -14,14 +14,14 @@ Mesh::Mesh(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indi
 }
 
 
-Mesh::~Mesh() {
+Graphics::Mesh::~Mesh() {
 	vertexBufferObject.Delete();
 	elementBufferObject.Delete();
 	vertexArrayObject.Delete();
 }
 
 
-void Mesh::Draw() {
+void Graphics::Mesh::Draw() {
 	vertexArrayObject.Bind();
 	elementBufferObject.Bind();
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);

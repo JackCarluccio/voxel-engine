@@ -1,4 +1,4 @@
-#include "shaderProgram.h"
+#include "graphics/shaderProgram.h"
 
 std::string ReadFile(const std::string& fileName) {
 	std::ifstream file("../../../shaders/" + fileName);
@@ -13,7 +13,7 @@ std::string ReadFile(const std::string& fileName) {
 }
 
 
-ShaderProgram::ShaderProgram(const std::string& vertexShaderFileName, const std::string& fragmentShaderFileName) {
+Graphics::ShaderProgram::ShaderProgram(const std::string& vertexShaderFileName, const std::string& fragmentShaderFileName) {
 	std::string vertexShaderSourceStr = ReadFile(vertexShaderFileName);
 	std::string fragmentShaderSourceStr = ReadFile(fragmentShaderFileName);
 
@@ -59,11 +59,11 @@ ShaderProgram::ShaderProgram(const std::string& vertexShaderFileName, const std:
 }
 
 
-void ShaderProgram::Activate() {
+void Graphics::ShaderProgram::Activate() {
 	glUseProgram(id);
 }
 
 
-void ShaderProgram::Delete() {
+void Graphics::ShaderProgram::Delete() {
 	glDeleteProgram(id);
 }
