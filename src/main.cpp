@@ -1,9 +1,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include <iostream>
 
-#include "shaderProgram.h"
+#include "ShaderProgram.h"
 #include "Mesh.h"
 
 // Vertices coordinates
@@ -22,6 +25,16 @@ const std::vector<GLuint> indices {
     3, 2, 4, // Lower right triangle
     5, 4, 1 // Upper triangle
 };
+
+float aspectRatio = 800.0f / 600.0f;
+
+glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+glm::mat4 model = glm::mat4(1.0f);
+glm::mat4 view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
+glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 
 
 // Window resize callback
@@ -66,7 +79,17 @@ int main() {
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-		mesh.Draw(shaderProgram);
+        shaderProgram.Activate();
+
+        GLuint modelLocation = glGetUniformLocation(shaderProgram.GetId(), "model");
+        GLuint viewLocation = glGetUniformLocation(shaderProgram.GetId(), "view");
+        GLuint projectionLocation = glGetUniformLocation(shaderProgram.GetId(), "projection");
+
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+
+		mesh.Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

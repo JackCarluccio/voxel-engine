@@ -21,8 +21,7 @@ Mesh::~Mesh() {
 }
 
 
-void Mesh::Draw(ShaderProgram& shaderProgram) {
-	shaderProgram.Activate();
+void Mesh::Draw() {
 	vertexArrayObject.Bind();
 	elementBufferObject.Bind();
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);

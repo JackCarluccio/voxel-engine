@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <glad/glad.h>
-#include "shaderProgram.h"
 #include "VAO.h"
 #include "VBO.h"
 #include "EBO.h"
@@ -12,7 +11,7 @@ public:
 	Mesh(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices);
 	~Mesh();
 
-	void Draw(ShaderProgram&);
+	void Draw();
 
 private:
 	VAO vertexArrayObject;
