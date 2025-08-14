@@ -4,39 +4,34 @@ void WorldGen::Chunk::BuildMesh(std::vector<GLint>& vertices, std::vector<GLuint
 	vertices.clear();
 	indices.clear();
 
-	//for (int y = 0; y < height; y++)
-	//	for (int x = 0; x < width; x++)
-	//		for (int z = 0; z < width; z++) {
-	//			if (GetBlock(x, y, z) != 0) {
-	//				// Add vertices for the cube
-	//				AddCubeVertices(vertices, x, y, z);
-	//			}
-	//		}
-	//	}
-	//}
+	for (int y = 1; y < height - 1; y++)
+	for (int x = 1; x < width - 1; x++)
+	for (int z = 1; z < width -1 ; z++) {
+		int index = IndexFromXYZ(x, y, z);
+		if (GetBlock(index) == 0)
+			continue;
 
-	vertices.push_back(WorldGen::GetVertexIndex(0, 0, 0));
-	vertices.push_back(WorldGen::GetVertexIndex(1, 0, 0));
-	vertices.push_back(WorldGen::GetVertexIndex(1, 0, 1));
-	vertices.push_back(WorldGen::GetVertexIndex(0, 0, 1));
+		// Construct each face
+		for (int i = 0; i < 6; i++) {
+			// Only construct this face if not occluded
+			int neighborIndex = index + neighborIndexOffsets[i];
+			if (GetBlock(neighborIndex) != 0)
+				continue;
+			
+			// Add each vertex
+			int originVertexIndex = GetVertexIndex(x, y, z);
+			for (int j = 0; j < 4; j++) {
+				vertices.push_back(originVertexIndex + faceVertexIndexOffsets[i][j]);
+			}
 
-	/*vertices.push_back(WorldGen::GetVertexIndex(0, 0, 0));
-	vertices.push_back(WorldGen::GetVertexIndex(1, 0, 0));
-	vertices.push_back(WorldGen::GetVertexIndex(1, 0, 1));
-	vertices.push_back(WorldGen::GetVertexIndex(0, 0, 1));*/
-
-	/*vertices.push_back(0);
-	vertices.push_back(1);
-	vertices.push_back(2);
-	vertices.push_back(3);*/
-
-	// Down left triangle
-	indices.push_back(0);
-	indices.push_back(1);
-	indices.push_back(2);
-
-	// Up right triangle
-	indices.push_back(0);
-	indices.push_back(2);
-	indices.push_back(3);
+			// Construct the two triangles
+			int indexOffset = vertices.size() - 4;
+			indices.push_back(indexOffset + 0);
+			indices.push_back(indexOffset + 1);
+			indices.push_back(indexOffset + 2);
+			indices.push_back(indexOffset + 0);
+			indices.push_back(indexOffset + 2);
+			indices.push_back(indexOffset + 3);			
+		}
+	}
 }

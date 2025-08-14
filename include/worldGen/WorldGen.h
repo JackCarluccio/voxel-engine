@@ -5,7 +5,7 @@
 #include "worldGen/Computed.h"
 
 namespace WorldGen {
-	static constexpr int surfaceLevel = 16;
+	static constexpr int surfaceLevel = 0;
 
 	Chunk GenerateChunk(const glm::ivec3& position);
 }

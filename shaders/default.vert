@@ -14,5 +14,5 @@ void main() {
 	int y = aVertexIndex / (17 * 17);
 
 	gl_Position = projection * view * model * vec4(x, y, z, 1.0);
-	color = vec3(1.0f, 1.0f, 1.0f);
+	color = vec3(x % 2, y % 2, z % 2);
 }

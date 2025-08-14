@@ -13,8 +13,8 @@
 
 float aspectRatio = 800.0f / 600.0f;
 
-glm::vec3 cameraPosition = glm::vec3(0.0f, 1.0f, 6.0f);
-glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraPosition = glm::vec3(8.0f, 16.0f, -40.0f);
+glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 glm::mat4 model = glm::mat4(1.0f);
@@ -37,9 +37,9 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
 // Update camera position based on key inputs
 void UpdateCamera(float delta) {
     glm::vec3 moveDirection(
-        isDHeld - isAHeld,
+        isAHeld - isDHeld,
         isEHeld - isQHeld,
-        isSHeld - isWHeld
+        isWHeld - isSHeld
     );
 
 	if (glm::length(moveDirection) > 0.0f) {
@@ -124,6 +124,13 @@ int main() {
         return -1;
     }
 
+    // Only render triangles if they appear CCW
+    glEnable(GL_CULL_FACE);
+	glCullFace(GL_CCW);
+
+    // Make sure triangles don't render over each other
+    glEnable(GL_DEPTH_TEST);
+
 	glfwSetKeyCallback(window, KeyCallback);
 
     // Create and use shader program
@@ -142,7 +149,7 @@ int main() {
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         UpdateCamera(0.01f);
 
