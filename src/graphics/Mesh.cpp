@@ -1,12 +1,12 @@
 #include "graphics/Mesh.h"
 
-Graphics::Mesh::Mesh(const std::vector<Graphics::Vertex>& vertices, const std::vector<GLuint>& indices): 
+Graphics::Mesh::Mesh(const std::vector<GLint>& vertices, const std::vector<GLuint>& indices): 
 	vertexArrayObject(), vertexBufferObject(vertices), elementBufferObject(indices), vertices(vertices), indices(indices)
 {
 	vertexArrayObject.Bind();
 	vertexBufferObject.Bind();
 	elementBufferObject.Bind();
-	vertexArrayObject.LinkAttrib(vertexBufferObject, 0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
+	vertexArrayObject.LinkAttribI(vertexBufferObject, 0, 1, GL_INT, sizeof(GLint), (void*)0);
 
 	vertexArrayObject.Unbind();
 	vertexBufferObject.Unbind();

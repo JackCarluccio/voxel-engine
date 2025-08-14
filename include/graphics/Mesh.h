@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <glad/glad.h>
-#include "graphics/Vertex.h"
 #include "graphics/VAO.h"
 #include "graphics/VBO.h"
 #include "graphics/EBO.h"
@@ -10,7 +9,7 @@
 namespace Graphics {
 	class Mesh {
 	public:
-		Mesh(const std::vector<Graphics::Vertex>& vertices, const std::vector<GLuint>& indices);
+		Mesh(const std::vector<GLint>& vertices, const std::vector<GLuint>& indices);
 		~Mesh();
 
 		void Draw();
@@ -20,7 +19,7 @@ namespace Graphics {
 		VBO vertexBufferObject;
 		EBO elementBufferObject;
 
-		const std::vector<Vertex>& vertices;
+		const std::vector<GLint>& vertices;
 		const std::vector<GLuint>& indices;
 	};
 }

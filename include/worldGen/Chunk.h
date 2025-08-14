@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
-#include "graphics/Vertex.h"
 #include "worldGen/Computed.h"
 
 namespace WorldGen {
@@ -37,6 +36,6 @@ namespace WorldGen {
 			SetBlock(index, block);
 		};
 
-		void BuildMesh(std::vector<Graphics::Vertex>& vertices, std::vector<GLuint>& indices) const;
+		void BuildMesh(std::vector<GLint>& vertices, std::vector<GLuint>& indices) const;
 	};
 }

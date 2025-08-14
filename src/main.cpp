@@ -8,13 +8,12 @@
 
 #include "graphics/ShaderProgram.h"
 #include "graphics/Mesh.h"
-#include "graphics/Vertex.h"
 #include "worldGen/Chunk.h"
 #include "worldGen/WorldGen.h"
 
 float aspectRatio = 800.0f / 600.0f;
 
-glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 6.0f);
+glm::vec3 cameraPosition = glm::vec3(0.0f, 1.0f, 6.0f);
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -132,7 +131,7 @@ int main() {
 
     //Graphics::Mesh mesh(vertices, indices);
 
-    std::vector<Graphics::Vertex> meshVertices;
+    std::vector<GLint> meshVertices;
 	std::vector<GLuint> meshIndices;
 
 	WorldGen::Chunk chunk = WorldGen::GenerateChunk(glm::ivec3(0, 0, 0));

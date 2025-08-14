@@ -47,7 +47,7 @@ add_executable(VoxelEngine
     "src/graphics/Mesh.cpp"
     "src/worldGen/Chunk.cpp"
     "src/worldGen/WorldGen.cpp"
- "include/graphics/Vertex.h" "include/worldGen/Computed.h")
+  "include/worldGen/Computed.h")
 
 # Include directories
 target_include_directories(VoxelEngine 

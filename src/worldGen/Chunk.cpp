@@ -1,6 +1,6 @@
 #include "worldGen/Chunk.h"
 
-void WorldGen::Chunk::BuildMesh(std::vector<Graphics::Vertex>& vertices, std::vector<GLuint>& indices) const {
+void WorldGen::Chunk::BuildMesh(std::vector<GLint>& vertices, std::vector<GLuint>& indices) const {
 	vertices.clear();
 	indices.clear();
 
@@ -15,10 +15,20 @@ void WorldGen::Chunk::BuildMesh(std::vector<Graphics::Vertex>& vertices, std::ve
 	//	}
 	//}
 
-	vertices.push_back(Graphics::Vertex{ 0.0f, 0.0f, 0.0f }); // Back left vertex
-	vertices.push_back(Graphics::Vertex{ 1.0f, 0.0f, 0.0f }); // Back right vertex
-	vertices.push_back(Graphics::Vertex{ 0.0f, 0.0f, 1.0f }); // Front left vertex
-	vertices.push_back(Graphics::Vertex{ 1.0f, 0.0f, 1.0f }); // Front right vertex
+	vertices.push_back(WorldGen::GetVertexIndex(0, 0, 0));
+	vertices.push_back(WorldGen::GetVertexIndex(1, 0, 0));
+	vertices.push_back(WorldGen::GetVertexIndex(1, 0, 1));
+	vertices.push_back(WorldGen::GetVertexIndex(0, 0, 1));
+
+	/*vertices.push_back(WorldGen::GetVertexIndex(0, 0, 0));
+	vertices.push_back(WorldGen::GetVertexIndex(1, 0, 0));
+	vertices.push_back(WorldGen::GetVertexIndex(1, 0, 1));
+	vertices.push_back(WorldGen::GetVertexIndex(0, 0, 1));*/
+
+	/*vertices.push_back(0);
+	vertices.push_back(1);
+	vertices.push_back(2);
+	vertices.push_back(3);*/
 
 	// Down left triangle
 	indices.push_back(0);
@@ -26,7 +36,7 @@ void WorldGen::Chunk::BuildMesh(std::vector<Graphics::Vertex>& vertices, std::ve
 	indices.push_back(2);
 
 	// Up right triangle
-	indices.push_back(1);
-	indices.push_back(3);
+	indices.push_back(0);
 	indices.push_back(2);
+	indices.push_back(3);
 }
