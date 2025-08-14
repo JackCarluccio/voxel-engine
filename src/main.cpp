@@ -12,23 +12,6 @@
 #include "worldGen/Chunk.h"
 #include "worldGen/WorldGen.h"
 
-// Vertices coordinates
-const std::vector<GLfloat> vertices {
-    -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower left corner
-    0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower right corner
-    0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // Upper corner
-    -0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner left
-    0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner right
-    0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f // Inner down
-};
-
-// Indices for vertices order
-const std::vector<GLuint> indices {
-    0, 3, 5, // Lower left triangle
-    3, 2, 4, // Lower right triangle
-    5, 4, 1 // Upper triangle
-};
-
 float aspectRatio = 800.0f / 600.0f;
 
 glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 6.0f);
@@ -62,7 +45,7 @@ void UpdateCamera(float delta) {
 
 	if (glm::length(moveDirection) > 0.0f) {
 		moveDirection = glm::normalize(moveDirection);
-		cameraPosition += moveDirection * delta;
+		cameraPosition += moveDirection * delta * 8.0f;
         view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
 	}
 }

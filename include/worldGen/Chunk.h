@@ -4,15 +4,11 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "graphics/Vertex.h"
+#include "worldGen/Computed.h"
 
 namespace WorldGen {
 	class Chunk {
 	public:
-		static constexpr int width = 16;
-		static constexpr int height = 256;
-		static constexpr int area = width * width;
-		static constexpr int volume = area * height;
-
 		// Helper functions
 		static constexpr int IndexFromXYZ(int x, int y, int z) {
 			return z + x * width + y * area;
