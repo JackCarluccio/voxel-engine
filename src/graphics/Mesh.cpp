@@ -1,6 +1,6 @@
 #include "graphics/Mesh.h"
 
-Graphics::Mesh::Mesh(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices): 
+Graphics::Mesh::Mesh(const std::vector<Graphics::Vertex>& vertices, const std::vector<GLuint>& indices): 
 	vertexArrayObject(), vertexBufferObject(vertices), elementBufferObject(indices), vertices(vertices), indices(indices)
 {
 	vertexArrayObject.Bind();

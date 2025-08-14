@@ -2,26 +2,25 @@
 
 #include <vector>
 #include <glad/glad.h>
+#include "graphics/Vertex.h"
 #include "graphics/VAO.h"
 #include "graphics/VBO.h"
 #include "graphics/EBO.h"
 
 namespace Graphics {
+	class Mesh {
+	public:
+		Mesh(const std::vector<Graphics::Vertex>& vertices, const std::vector<GLuint>& indices);
+		~Mesh();
 
-class Mesh {
-public:
-	Mesh(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices);
-	~Mesh();
+		void Draw();
 
-	void Draw();
+	private:
+		VAO vertexArrayObject;
+		VBO vertexBufferObject;
+		EBO elementBufferObject;
 
-private:
-	VAO vertexArrayObject;
-	VBO vertexBufferObject;
-	EBO elementBufferObject;
-
-	const std::vector<GLfloat>& vertices;
-	const std::vector<GLuint>& indices;
-};
-
+		const std::vector<Vertex>& vertices;
+		const std::vector<GLuint>& indices;
+	};
 }

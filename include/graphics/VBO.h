@@ -2,12 +2,13 @@
 
 #include <vector>
 #include <glad/glad.h>
+#include "graphics/Vertex.h"
 
 namespace Graphics {
 
 class VBO {
 public:
-	VBO(const std::vector<GLfloat>& vertices);
+	VBO(const std::vector<Graphics::Vertex>& vertices);
 	~VBO();
 
 	void Bind() const;

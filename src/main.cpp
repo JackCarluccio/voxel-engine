@@ -8,6 +8,7 @@
 
 #include "graphics/ShaderProgram.h"
 #include "graphics/Mesh.h"
+#include "graphics/Vertex.h"
 #include "worldGen/Chunk.h"
 #include "worldGen/WorldGen.h"
 
@@ -148,7 +149,7 @@ int main() {
 
     //Graphics::Mesh mesh(vertices, indices);
 
-    std::vector<GLfloat> meshVertices;
+    std::vector<Graphics::Vertex> meshVertices;
 	std::vector<GLuint> meshIndices;
 
 	WorldGen::Chunk chunk = WorldGen::GenerateChunk(glm::ivec3(0, 0, 0));
