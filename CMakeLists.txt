@@ -45,6 +45,8 @@ add_executable(VoxelEngine
     "src/graphics/VBO.cpp"
     "src/graphics/EBO.cpp"
     "src/graphics/Mesh.cpp"
+    "src/worldGen/Chunk.cpp"
+    "src/worldGen/WorldGen.cpp"
 )
 
 # Include directories

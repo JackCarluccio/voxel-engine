@@ -8,6 +8,8 @@
 
 #include "graphics/ShaderProgram.h"
 #include "graphics/Mesh.h"
+#include "worldGen/Chunk.h"
+#include "worldGen/WorldGen.h"
 
 // Vertices coordinates
 const std::vector<GLfloat> vertices {
@@ -144,7 +146,15 @@ int main() {
     // Create and use shader program
 	Graphics::ShaderProgram shaderProgram("default.vert", "default.frag");
 
-    Graphics::Mesh mesh(vertices, indices);
+    //Graphics::Mesh mesh(vertices, indices);
+
+    std::vector<GLfloat> meshVertices;
+	std::vector<GLuint> meshIndices;
+
+	WorldGen::Chunk chunk = WorldGen::GenerateChunk(glm::ivec3(0, 0, 0));
+	chunk.BuildMesh(meshVertices, meshIndices);
+
+    Graphics::Mesh mesh(meshVertices, meshIndices);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
