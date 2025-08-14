@@ -14,8 +14,8 @@ class ShaderProgram {
 public:
 	ShaderProgram(const std::string& vertexSourceFileName, const std::string& fragmentSourceFileName);
 
-	void Activate();
-	void Delete();
+	void Activate() const;
+	void Delete() const;
 
 	GLuint GetId() const { return id; }
 

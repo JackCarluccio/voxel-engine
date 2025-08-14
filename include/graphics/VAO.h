@@ -10,10 +10,10 @@ public:
 	VAO();
 	~VAO();
 
-	void Bind();
-	void Unbind();
+	void Bind() const;
+	void Unbind() const;
 	void LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset);
-	void Delete();
+	void Delete() const;
 
 	GLuint GetId() const { return id; }
 

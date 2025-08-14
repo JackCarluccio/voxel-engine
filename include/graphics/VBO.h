@@ -10,11 +10,11 @@ public:
 	VBO(const std::vector<GLfloat>& vertices);
 	~VBO();
 
-	void Bind();
-	void Unbind();
-	void Delete();
+	void Bind() const;
+	void Unbind() const;
+	void Delete() const;
 
-	GLuint GetId() const { return id; }
+	inline GLuint GetId() const { return id; }
 
 private:
 	GLuint id;

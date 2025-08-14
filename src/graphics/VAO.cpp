@@ -19,16 +19,16 @@ void Graphics::VAO::LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GL
 }
 
 // Binds the VAO
-void Graphics::VAO::Bind() {
+void Graphics::VAO::Bind() const {
 	glBindVertexArray(id);
 }
 
 // Unbinds the VAO
-void Graphics::VAO::Unbind() {
+void Graphics::VAO::Unbind() const {
 	glBindVertexArray(0);
 }
 
 // Deletes the VAO
-void Graphics::VAO::Delete() {
+void Graphics::VAO::Delete() const {
 	glDeleteVertexArrays(1, &id);
 }

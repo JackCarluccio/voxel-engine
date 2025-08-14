@@ -59,11 +59,11 @@ Graphics::ShaderProgram::ShaderProgram(const std::string& vertexShaderFileName, 
 }
 
 
-void Graphics::ShaderProgram::Activate() {
+void Graphics::ShaderProgram::Activate() const {
 	glUseProgram(id);
 }
 
 
-void Graphics::ShaderProgram::Delete() {
+void Graphics::ShaderProgram::Delete() const {
 	glDeleteProgram(id);
 }

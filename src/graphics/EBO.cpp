@@ -13,16 +13,16 @@ Graphics::EBO::~EBO() {
 }
 
 // Binds the EBO
-void Graphics::EBO::Bind() {
+void Graphics::EBO::Bind() const {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
 }
 
 // Unbinds the EBO
-void Graphics::EBO::Unbind() {
+void Graphics::EBO::Unbind() const {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 // Deletes the EBO
-void Graphics::EBO::Delete() {
+void Graphics::EBO::Delete() const {
 	glDeleteBuffers(1, &id);
 }

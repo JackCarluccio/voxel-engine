@@ -36,10 +36,80 @@ glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
 glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 
+bool isWHeld = false;
+bool isSHeld = false;
+bool isAHeld = false;
+bool isDHeld = false;
+bool isQHeld = false;
+bool isEHeld = false;
+
 
 // Window resize callback
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+}
+
+// Update camera position based on key inputs
+void UpdateCamera(float delta) {
+    glm::vec3 moveDirection(
+        isDHeld - isAHeld,
+        isEHeld - isQHeld,
+        isSHeld - isWHeld
+    );
+
+	if (glm::length(moveDirection) > 0.0f) {
+		moveDirection = glm::normalize(moveDirection);
+		cameraPosition += moveDirection * delta;
+        view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
+	}
+}
+
+// Key callback function to handle key inputs. Stores state of keys.
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    switch (key) {
+    case GLFW_KEY_W:
+        if (action == GLFW_PRESS) {
+            isWHeld = true;
+        } else if (action == GLFW_RELEASE) {
+            isWHeld = false;
+        }
+        break;
+    case GLFW_KEY_S:
+        if (action == GLFW_PRESS) {
+            isSHeld = true;
+        } else if (action == GLFW_RELEASE) {
+            isSHeld = false;
+        }
+        break;
+    case GLFW_KEY_A:
+		if (action == GLFW_PRESS) {
+			isAHeld = true;
+		} else if (action == GLFW_RELEASE) {
+			isAHeld = false;
+		}
+		break;
+	case GLFW_KEY_D:
+        if (action == GLFW_PRESS) {
+            isDHeld = true;
+		} else if (action == GLFW_RELEASE) {
+            isDHeld = false;
+        }
+        break;
+    case GLFW_KEY_Q:
+        if (action == GLFW_PRESS) {
+            isQHeld = true;
+        } else if (action == GLFW_RELEASE) {
+			isQHeld = false;
+		}
+		break;
+    case GLFW_KEY_E:
+		if (action == GLFW_PRESS) {
+			isEHeld = true;
+		} else if (action == GLFW_RELEASE) {
+			isEHeld = false;
+		}
+		break;
+    }
 }
 
 int main() {
@@ -69,6 +139,8 @@ int main() {
         return -1;
     }
 
+	glfwSetKeyCallback(window, KeyCallback);
+
     // Create and use shader program
 	Graphics::ShaderProgram shaderProgram("default.vert", "default.frag");
 
@@ -78,6 +150,8 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        UpdateCamera(0.01f);
 
         shaderProgram.Activate();
 

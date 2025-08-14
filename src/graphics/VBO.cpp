@@ -13,16 +13,16 @@ Graphics::VBO::~VBO() {
 }
 
 // Binds the VBO
-void Graphics::VBO::Bind() {
+void Graphics::VBO::Bind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 
 // Unbinds the VBO
-void Graphics::VBO::Unbind() {
+void Graphics::VBO::Unbind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 // Deletes the VBO
-void Graphics::VBO::Delete() {
+void Graphics::VBO::Delete() const {
 	glDeleteBuffers(1, &id);
 }
