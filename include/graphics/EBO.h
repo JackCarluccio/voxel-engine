@@ -7,7 +7,7 @@ namespace Graphics {
 
 	class EBO {
 	public:
-		EBO(const std::vector<GLuint>& indices);
+		EBO(GLsizeiptr size, const void* data);
 		~EBO() { Delete(); };
 
 		// Disable copy constructors. Multiple VAOs should not point to the same buffer.

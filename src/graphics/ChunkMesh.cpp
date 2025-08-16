@@ -1,7 +1,10 @@
 #include "graphics/ChunkMesh.h"
 
 Graphics::ChunkMesh::ChunkMesh(const std::vector<GLint>& vertices, const std::vector<GLuint>& indices):
-	vertexArrayObject(), vertexBufferObject(vertices), elementBufferObject(indices), indexCount(indices.size())
+	vertexArrayObject(),
+	vertexBufferObject(vertices.size() * sizeof(GLint), vertices.data()),
+	elementBufferObject(indices.size() * sizeof(GLuint), indices.data()),
+	indexCount(indices.size())
 {
 	vertexArrayObject.Bind();
 	vertexBufferObject.Bind();

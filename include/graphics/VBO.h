@@ -7,7 +7,7 @@ namespace Graphics {
 
 	class VBO {
 	public:
-		VBO(const std::vector<GLint>& vertices);
+		VBO(GLsizeiptr size, const void* data);
 		~VBO() { Delete(); };
 
 		// Disable copy constructors. Multiple VAOs should not point to the same buffer.
