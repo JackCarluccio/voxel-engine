@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <algorithm>
+
 #include "worldGen/Chunk.h"
 #include "worldGen/Computed.h"
 

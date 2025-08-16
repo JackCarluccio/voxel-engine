@@ -1,8 +1,8 @@
 #include "worldGen/Chunk.h"
 
-void WorldGen::Chunk::BuildMesh(std::vector<GLint>& vertices, std::vector<GLuint>& indices) const {
-	vertices.clear();
-	indices.clear();
+Graphics::ChunkMesh WorldGen::Chunk::BuildMesh() const {
+	std::vector<GLint> vertices;
+	std::vector<GLuint> indices;
 
 	for (int y = 1; y < height - 1; y++)
 	for (int x = 1; x < width - 1; x++)
@@ -34,4 +34,6 @@ void WorldGen::Chunk::BuildMesh(std::vector<GLint>& vertices, std::vector<GLuint
 			indices.push_back(indexOffset + 3);			
 		}
 	}
+
+	return Graphics::ChunkMesh(vertices, indices);
 }

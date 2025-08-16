@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include "graphics/ChunkMesh.h"
 #include "worldGen/Computed.h"
 
 namespace WorldGen {
@@ -17,6 +18,18 @@ namespace WorldGen {
 		std::vector<uint8_t> blocks;
 
 		Chunk(const glm::ivec3& p) : position(p), blocks(volume) {};
+
+		// Disable copying.
+		Chunk(const Chunk&) = delete;
+		Chunk& operator=(const Chunk&) = delete;
+
+		Chunk(Chunk&& other) noexcept :
+			position(other.position),
+			blocks(std::move(other.blocks))
+		{
+			other.blocks.clear(); // Clear the moved-from chunk's blocks
+		}
+		Chunk& operator=(Chunk&&) = delete;
 
 		// GetBlock methods
 		inline uint8_t GetBlock(int index) const noexcept {
@@ -36,6 +49,6 @@ namespace WorldGen {
 			SetBlock(index, block);
 		};
 
-		void BuildMesh(std::vector<GLint>& vertices, std::vector<GLuint>& indices) const;
+		Graphics::ChunkMesh BuildMesh() const;
 	};
 }

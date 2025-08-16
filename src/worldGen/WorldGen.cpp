@@ -13,8 +13,8 @@ namespace WorldGen {
 		int heightMap[area];
 		for (int x = 0; x < width; x++)
 		for (int z = 0; z < width; z++) {
-			int heightOffset = chunkWorldX + x + chunkWorldZ + z;
-			heightMap[z + x * width] = surfaceLevel + heightOffset;
+			int heightOffset = (chunkWorldX + x + chunkWorldZ + z) / 2;
+			heightMap[z + x * width] = std::clamp(surfaceLevel + heightOffset, 2, 250);
 		}
 
 		// Set each block below the terrain height to stone

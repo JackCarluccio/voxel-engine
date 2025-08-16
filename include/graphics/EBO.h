@@ -5,19 +5,38 @@
 
 namespace Graphics {
 
-class EBO {
-public:
-	EBO(const std::vector<GLuint>& indices);
-	~EBO();
+	class EBO {
+	public:
+		EBO(const std::vector<GLuint>& indices);
+		~EBO() { Delete(); };
 
-	void Bind() const;
-	void Unbind() const;
-	void Delete() const;
+		// Disable copy constructors. Multiple VAOs should not point to the same buffer.
+		EBO(const EBO&) = delete;
+		EBO& operator=(const EBO&) = delete;
 
-	GLuint GetId() const { return id; }
+		EBO(EBO&& other) noexcept {
+			steal(other);
+		}
+		EBO& operator=(EBO&& other) noexcept {
+			if (this != &other) {
+				destroy();
+				steal(other);
+			}
 
-private:
-	GLuint id;
-};
+			return *this;
+		}
+
+		void Bind() const;
+		void Unbind() const;
+		void Delete();
+
+		inline GLuint GetId() const noexcept { return id; }
+
+	private:
+		GLuint id;
+
+		void destroy() { Delete(); };
+		void steal(EBO& other) noexcept;
+	};
 
 }

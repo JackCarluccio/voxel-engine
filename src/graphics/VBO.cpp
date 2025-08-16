@@ -7,11 +7,6 @@ Graphics::VBO::VBO(const std::vector<GLint>& vertices) {
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLint), &vertices[0], GL_STATIC_DRAW);
 }
 
-
-Graphics::VBO::~VBO() {
-	Delete();
-}
-
 // Binds the VBO
 void Graphics::VBO::Bind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -23,6 +18,15 @@ void Graphics::VBO::Unbind() const {
 }
 
 // Deletes the VBO
-void Graphics::VBO::Delete() const {
-	glDeleteBuffers(1, &id);
+void Graphics::VBO::Delete() {
+	if (id != 0) {
+		glDeleteBuffers(1, &id);
+		id = 0;
+	}
+}
+
+// Steal from another VBO by taking its ID
+void Graphics::VBO::steal(VBO& other) noexcept {
+	id = other.id;
+	other.id = 0; // Set the other's id to 0 to avoid double deletion
 }

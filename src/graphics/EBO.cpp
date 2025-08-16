@@ -7,11 +7,6 @@ Graphics::EBO::EBO(const std::vector<GLuint>& indices) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 }
 
-
-Graphics::EBO::~EBO() {
-	Delete();
-}
-
 // Binds the EBO
 void Graphics::EBO::Bind() const {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
@@ -23,6 +18,15 @@ void Graphics::EBO::Unbind() const {
 }
 
 // Deletes the EBO
-void Graphics::EBO::Delete() const {
-	glDeleteBuffers(1, &id);
+void Graphics::EBO::Delete() {
+	if (id != 0) {
+		glDeleteBuffers(1, &id);
+		id = 0;
+	}
+}
+
+// Steal from another EBO by taking its ID
+void Graphics::EBO::steal(EBO& other) noexcept {
+	id = other.id;
+	other.id = 0; // Set the other's id to 0 to avoid double deletion
 }

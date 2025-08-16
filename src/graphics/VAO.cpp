@@ -5,12 +5,7 @@ Graphics::VAO::VAO() {
 	glGenVertexArrays(1, &id);
 }
 
-
-Graphics::VAO::~VAO() {
-	Delete();
-}
-
-// Links a VBO Attribute such as a position or color to the VAO
+// Links a VBO attribute
 void Graphics::VAO::LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset) {
 	VBO.Bind();
 	glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
@@ -18,11 +13,24 @@ void Graphics::VAO::LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GL
 	VBO.Unbind();
 }
 
+// Links a VBO integer attribute
 void Graphics::VAO::LinkAttribI(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset) {
 	VBO.Bind();
 	glVertexAttribIPointer(layout, numComponents, type, stride, offset);
 	glEnableVertexAttribArray(layout);
 	VBO.Unbind();
+}
+
+// Links a VBO attribute without binding/unbinding the VBO
+void Graphics::VAO::LinkAttribNoBinding(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset) {
+	glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
+	glEnableVertexAttribArray(layout);
+}
+
+// Links a VBO integer attribute without binding/unbinding the VBO
+void Graphics::VAO::LinkAttribINoBinding(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset) {
+	glVertexAttribIPointer(layout, numComponents, type, stride, offset);
+	glEnableVertexAttribArray(layout);
 }
 
 // Binds the VAO
@@ -36,6 +44,15 @@ void Graphics::VAO::Unbind() const {
 }
 
 // Deletes the VAO
-void Graphics::VAO::Delete() const {
-	glDeleteVertexArrays(1, &id);
+void Graphics::VAO::Delete() {
+	if (id != 0) {
+		glDeleteVertexArrays(1, &id);
+		id = 0;
+	}
+}
+
+// Steal from another VAO by taking its ID
+void Graphics::VAO::steal(VAO& other) noexcept {
+	id = other.id;
+	other.id = 0;
 }

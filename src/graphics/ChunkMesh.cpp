@@ -1,7 +1,7 @@
-#include "graphics/Mesh.h"
+#include "graphics/ChunkMesh.h"
 
-Graphics::Mesh::Mesh(const std::vector<GLint>& vertices, const std::vector<GLuint>& indices): 
-	vertexArrayObject(), vertexBufferObject(vertices), elementBufferObject(indices), vertices(vertices), indices(indices)
+Graphics::ChunkMesh::ChunkMesh(const std::vector<GLint>& vertices, const std::vector<GLuint>& indices):
+	vertexArrayObject(), vertexBufferObject(vertices), elementBufferObject(indices), indexCount(indices.size())
 {
 	vertexArrayObject.Bind();
 	vertexBufferObject.Bind();
@@ -14,15 +14,15 @@ Graphics::Mesh::Mesh(const std::vector<GLint>& vertices, const std::vector<GLuin
 }
 
 
-Graphics::Mesh::~Mesh() {
+Graphics::ChunkMesh::~ChunkMesh() {
 	vertexBufferObject.Delete();
 	elementBufferObject.Delete();
 	vertexArrayObject.Delete();
 }
 
 
-void Graphics::Mesh::Draw() {
+void Graphics::ChunkMesh::Draw() const {
 	vertexArrayObject.Bind();
 	elementBufferObject.Bind();
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 }

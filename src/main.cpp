@@ -7,9 +7,14 @@
 #include <iostream>
 
 #include "graphics/ShaderProgram.h"
-#include "graphics/Mesh.h"
+#include "graphics/ChunkMesh.h"
 #include "worldGen/Chunk.h"
 #include "worldGen/WorldGen.h"
+
+struct ChunkInfo {
+    WorldGen::Chunk chunk;
+    Graphics::ChunkMesh mesh;
+};
 
 float aspectRatio = 800.0f / 600.0f;
 
@@ -17,9 +22,9 @@ glm::vec3 cameraPosition = glm::vec3(8.0f, 16.0f, -40.0f);
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-glm::mat4 model = glm::mat4(1.0f);
+//glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
-glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 500.0f);
 
 bool isWHeld = false;
 bool isSHeld = false;
@@ -108,7 +113,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Voxel Engine", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1920, 1080, "Voxel Engine", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -136,15 +141,14 @@ int main() {
     // Create and use shader program
 	Graphics::ShaderProgram shaderProgram("default.vert", "default.frag");
 
-    //Graphics::Mesh mesh(vertices, indices);
-
-    std::vector<GLint> meshVertices;
-	std::vector<GLuint> meshIndices;
-
-	WorldGen::Chunk chunk = WorldGen::GenerateChunk(glm::ivec3(0, 0, 0));
-	chunk.BuildMesh(meshVertices, meshIndices);
-
-    Graphics::Mesh mesh(meshVertices, meshIndices);
+    std::vector<ChunkInfo> chunks;
+    for (int x = -3; x <= 3; x++)
+    for (int z = 0; z <= 10; z++) {
+        glm::ivec3 chunkCoordinate(x, 0, z);
+		WorldGen::Chunk chunk = WorldGen::GenerateChunk(chunkCoordinate);
+		Graphics::ChunkMesh mesh = chunk.BuildMesh();
+		chunks.emplace_back(std::move(chunk), std::move(mesh));
+    }
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -155,15 +159,20 @@ int main() {
 
         shaderProgram.Activate();
 
-        GLuint modelLocation = glGetUniformLocation(shaderProgram.GetId(), "model");
+        // Update camera and projection matrices once per frame
         GLuint viewLocation = glGetUniformLocation(shaderProgram.GetId(), "view");
         GLuint projectionLocation = glGetUniformLocation(shaderProgram.GetId(), "projection");
-
-        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
 
-		mesh.Draw();
+        GLuint modelLocation = glGetUniformLocation(shaderProgram.GetId(), "model");
+
+        for (const ChunkInfo& chunk : chunks) {
+			glm::ivec3 chunkPosition = chunk.chunk.position;
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(chunkPosition.x * WorldGen::width, 0, chunkPosition.z * WorldGen::width));
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+			chunk.mesh.Draw();
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();

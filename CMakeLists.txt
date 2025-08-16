@@ -44,7 +44,7 @@ add_executable(VoxelEngine
     "src/graphics/VAO.cpp"
     "src/graphics/VBO.cpp"
     "src/graphics/EBO.cpp"
-    "src/graphics/Mesh.cpp"
+    "src/graphics/ChunkMesh.cpp"
     "src/worldGen/Chunk.cpp"
     "src/worldGen/WorldGen.cpp"
   "include/worldGen/Computed.h")
