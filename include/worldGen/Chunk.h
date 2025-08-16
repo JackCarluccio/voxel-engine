@@ -14,10 +14,10 @@ namespace WorldGen {
 			return z + x * width + y * area;
 		}
 
-		const glm::ivec3 position;
+		const glm::ivec2 position;
 		std::vector<uint8_t> blocks;
 
-		Chunk(const glm::ivec3& p) : position(p), blocks(volume) {};
+		Chunk(const glm::ivec2& p) : position(p), blocks(volume) {};
 
 		// Disable copying.
 		Chunk(const Chunk&) = delete;

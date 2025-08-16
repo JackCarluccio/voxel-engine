@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
+#include <chrono>
 #include <iostream>
 
 #include "graphics/ShaderProgram.h"
@@ -24,7 +25,7 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 //glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
-glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 500.0f);
+glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 5000.0f);
 
 bool isWHeld = false;
 bool isSHeld = false;
@@ -40,7 +41,7 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 // Update camera position based on key inputs
-void UpdateCamera(float delta) {
+void UpdateCamera(float deltaTime) {
     glm::vec3 moveDirection(
         isAHeld - isDHeld,
         isEHeld - isQHeld,
@@ -49,7 +50,7 @@ void UpdateCamera(float delta) {
 
 	if (glm::length(moveDirection) > 0.0f) {
 		moveDirection = glm::normalize(moveDirection);
-		cameraPosition += moveDirection * delta * 8.0f;
+		cameraPosition += moveDirection * deltaTime * 8.0f;
         view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
 	}
 }
@@ -142,20 +143,33 @@ int main() {
 	Graphics::ShaderProgram shaderProgram("default.vert", "default.frag");
 
     std::vector<ChunkInfo> chunks;
-    for (int x = -3; x <= 3; x++)
-    for (int z = 0; z <= 10; z++) {
-        glm::ivec3 chunkCoordinate(x, 0, z);
+    for (int x = -10; x <= 10; x++)
+    for (int z = -1; z <= 10; z++) {
+        glm::ivec2 chunkCoordinate(x, z);
 		WorldGen::Chunk chunk = WorldGen::GenerateChunk(chunkCoordinate);
 		Graphics::ChunkMesh mesh = chunk.BuildMesh();
 		chunks.emplace_back(std::move(chunk), std::move(mesh));
     }
 
+    int frameCount = 0;
+	std::chrono::steady_clock::time_point lastFrameTime = std::chrono::steady_clock::now();
+
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+        // Calculate delta time
+        frameCount++;
+		std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+		float deltaTime = std::chrono::duration<float>(currentTime - lastFrameTime).count();
+		lastFrameTime = currentTime;
+
+		if (frameCount % 60 == 0) {
+			std::cout << "FPS: " << (1.0f / deltaTime) << std::endl;
+		}
+
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        UpdateCamera(0.01f);
+        UpdateCamera(deltaTime);
 
         shaderProgram.Activate();
 
@@ -168,8 +182,8 @@ int main() {
         GLuint modelLocation = glGetUniformLocation(shaderProgram.GetId(), "model");
 
         for (const ChunkInfo& chunk : chunks) {
-			glm::ivec3 chunkPosition = chunk.chunk.position;
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(chunkPosition.x * WorldGen::width, 0, chunkPosition.z * WorldGen::width));
+			glm::ivec2 chunkPosition = chunk.chunk.position;
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(chunkPosition.x * WorldGen::width, 0, chunkPosition.y * WorldGen::width));
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 			chunk.mesh.Draw();
         }

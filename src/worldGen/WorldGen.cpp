@@ -3,18 +3,23 @@
 using namespace WorldGen;
 
 namespace WorldGen {
-	Chunk GenerateChunk(const glm::ivec3& position) {
+	Chunk GenerateChunk(const glm::ivec2& position) {
 		Chunk chunk(position);
 
 		int chunkWorldX = position.x * width;
-		int chunkWorldZ = position.z * width;
+		int chunkWorldZ = position.y * width;
 
 		// Generate a heightmap which controls the height of the terrain
 		int heightMap[area];
 		for (int x = 0; x < width; x++)
 		for (int z = 0; z < width; z++) {
-			int heightOffset = (chunkWorldX + x + chunkWorldZ + z) / 2;
-			heightMap[z + x * width] = std::clamp(surfaceLevel + heightOffset, 2, 250);
+			float noise = PerlinNoise2d(
+				static_cast<float>(chunkWorldX + x) / 64.0f,
+				static_cast<float>(chunkWorldZ + z) / 64.0f
+			);
+
+			float height = noise * 32.0f + 36.0f; // Scale the noise to a reasonable height
+			heightMap[z + x * width] = std::clamp(static_cast<int>(height), 2, 250);
 		}
 
 		// Set each block below the terrain height to stone
