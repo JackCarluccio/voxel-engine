@@ -22,7 +22,7 @@ struct ChunkInfo {
 
 float aspectRatio = 1920.0f / 1080.0f;
 
-glm::vec3 cameraPosition = glm::vec3(8.0f, 16.0f, -40.0f);
+glm::vec3 cameraPosition = glm::vec3(0.0f, 128.0f, 0.0f);
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -41,21 +41,80 @@ bool isEHeld = false;
 // Window resize callback
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+
+	aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+	projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 5000.0f);
 }
 
-// Update camera position based on key inputs
-void UpdateCamera(float deltaTime) {
-    glm::vec3 moveDirection(
-        isAHeld - isDHeld,
-        isEHeld - isQHeld,
-        isWHeld - isSHeld
-    );
+bool firstMouse = true;
+void WindowFocusCallback(GLFWwindow* window, int focused) {
+    if (focused) {
+        // Window gained focus
+        firstMouse = true;  // Reset mouse tracking when returning to window
+    } else {
+        // Window lost focus
+        // Release all held keys to prevent getting stuck
+        isWHeld = isSHeld = isAHeld = isDHeld = isQHeld = isEHeld = false;
+    }
+}
 
-	if (glm::length(moveDirection) > 0.0f) {
-		moveDirection = glm::normalize(moveDirection);
-		cameraPosition += moveDirection * deltaTime * 8.0f;
-        view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
-	}
+// Update camera position and rotation from key and mouse inputs
+double lastMouseX = 0.0f, lastMouseY = 0.0f;
+float cameraYaw = 0.0f;
+float cameraPitch = 0.0f;
+void UpdateCamera(float deltaTime) {
+    // Handle keyboard movement
+    glm::vec3 right = glm::normalize(glm::cross(cameraDirection, cameraUp));
+    glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    glm::vec3 moveDirection(0.0f);
+    if (isAHeld) moveDirection -= right;
+    if (isDHeld) moveDirection += right;
+    if (isQHeld) moveDirection -= worldUp;
+    if (isEHeld) moveDirection += worldUp;
+    if (isWHeld) moveDirection += cameraDirection;
+    if (isSHeld) moveDirection -= cameraDirection;
+
+    if (glm::length(moveDirection) > 0.0f) {
+        moveDirection = glm::normalize(moveDirection);
+        cameraPosition += moveDirection * deltaTime * 8.0f;
+    }
+
+    // Handle mouse rotation
+    double mouseX, mouseY;
+    glfwGetCursorPos(glfwGetCurrentContext(), &mouseX, &mouseY);
+
+    if (firstMouse) {
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+        firstMouse = false;
+    }
+
+    // Calculate mouse movement sensitivity
+    float sensitivity = 0.1f;
+    float xOffset = static_cast<float>(mouseX - lastMouseX) * sensitivity;
+    float yOffset = static_cast<float>(lastMouseY - mouseY) * sensitivity; // Reversed for y-coordinates
+
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+
+    // Update camera orientation
+    cameraYaw += xOffset;
+    cameraPitch += yOffset;
+
+    // Prevent looking too far up or down
+    if (cameraPitch > 89.0f) cameraPitch = 89.0f;
+    if (cameraPitch < -89.0f) cameraPitch = -89.0f;
+
+    // Calculate new direction vector
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(cameraYaw)) * cos(glm::radians(cameraPitch));
+    direction.y = sin(glm::radians(cameraPitch));
+    direction.z = sin(glm::radians(cameraYaw)) * cos(glm::radians(cameraPitch));
+    cameraDirection = glm::normalize(direction);
+
+    // Rebuild view matrix
+    view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, worldUp);
 }
 
 // Key callback function to handle key inputs. Stores state of keys.
@@ -117,15 +176,34 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(1920, 1080, "Voxel Engine", nullptr, nullptr);
+    // Set relevant window hints before creating the window.
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+    // Create a borderless window, not fullscreen. Fullscreen causes many issues
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "Voxel Engine", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
 
+    glfwSetWindowPos(window, 0, 0);
     glfwMakeContextCurrent(window);
+
+	// Reset cursor position and key states when the window changes focus
+    glfwSetWindowFocusCallback(window, WindowFocusCallback);
+	// Update OpenGL's viewport and adjust the projection matrix when the window is resized
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+
+    // Hide cursor and lock it to the window. Cursor inputs still work
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// Enables/Disables VSync. Without VSync, screen tearing can occur, and resource usage is higher
+	glfwSwapInterval(1);
 
     // Load OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -149,7 +227,7 @@ int main() {
 
     std::vector<ChunkInfo> chunks;
     for (int x = -10; x <= 10; x++)
-    for (int z = -1; z <= 10; z++) {
+    for (int z = -10; z <= 10; z++) {
         glm::ivec2 chunkCoordinate(x, z);
 		WorldGen::Chunk chunk = WorldGen::GenerateChunk(chunkCoordinate);
 		Graphics::ChunkMesh mesh = chunk.BuildMesh();
@@ -175,6 +253,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         UpdateCamera(deltaTime);
+        firstMouse = false;
 
         shaderProgram.Activate();
         glUniform1i(glGetUniformLocation(shaderProgram.GetId(), "textureAtlas"), 0);

@@ -14,11 +14,11 @@ namespace WorldGen {
 		for (int x = 0; x < width; x++)
 		for (int z = 0; z < width; z++) {
 			float noise = PerlinNoise2d(
-				static_cast<float>(chunkWorldX + x) / 64.0f,
-				static_cast<float>(chunkWorldZ + z) / 64.0f
+				static_cast<float>(chunkWorldX + x) / 128.0f,
+				static_cast<float>(chunkWorldZ + z) / 128.0f
 			);
 
-			float height = noise * 32.0f + 36.0f; // Scale the noise to a reasonable height
+			float height = noise * 96.0f + 100.0f; // Scale the noise to a reasonable height
 			heightMap[z + x * width] = std::clamp(static_cast<int>(height), 2, 250);
 		}
 
