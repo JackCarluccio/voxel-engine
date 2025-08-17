@@ -1,8 +1,11 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 #include <vector>
 #include <chrono>
 #include <iostream>
@@ -17,7 +20,7 @@ struct ChunkInfo {
     Graphics::ChunkMesh mesh;
 };
 
-float aspectRatio = 800.0f / 600.0f;
+float aspectRatio = 1920.0f / 1080.0f;
 
 glm::vec3 cameraPosition = glm::vec3(8.0f, 16.0f, -40.0f);
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -137,6 +140,8 @@ int main() {
     // Make sure triangles don't render over each other
     glEnable(GL_DEPTH_TEST);
 
+    Graphics::ChunkMesh::LoadTextureAtlas("../../../assets/texture_atlas.png");
+
 	glfwSetKeyCallback(window, KeyCallback);
 
     // Create and use shader program
@@ -172,6 +177,7 @@ int main() {
         UpdateCamera(deltaTime);
 
         shaderProgram.Activate();
+        glUniform1i(glGetUniformLocation(shaderProgram.GetId(), "textureAtlas"), 0);
 
         // Update camera and projection matrices once per frame
         GLuint viewLocation = glGetUniformLocation(shaderProgram.GetId(), "view");

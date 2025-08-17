@@ -1,8 +1,9 @@
 #version 460 core
 
 layout (location = 0) in int aVertexIndex;
+layout (location = 1) in vec2 aTexCoord;
 
-out vec3 color;
+out vec2 texCoord;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -14,5 +15,5 @@ void main() {
 	int y = aVertexIndex / (17 * 17);
 
 	gl_Position = projection * view * model * vec4(x, y, z, 1.0);
-	color = vec3(x % 2, y % 2, z % 2);
+	texCoord = aTexCoord;
 }

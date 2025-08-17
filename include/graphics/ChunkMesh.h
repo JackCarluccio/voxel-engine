@@ -1,15 +1,24 @@
 #pragma once
 
-#include <vector>
 #include <glad/glad.h>
+
+#include <vector>
+#include <iostream>
+
 #include "graphics/VAO.h"
 #include "graphics/VBO.h"
 #include "graphics/EBO.h"
+#include "graphics/stb_image.h"
 
 namespace Graphics {
+	struct VertexData {
+		GLint index;
+		GLfloat u, v;
+	};
+
 	class ChunkMesh {
 	public:
-		ChunkMesh(const std::vector<GLint>& vertices, const std::vector<GLuint>& indices);
+		ChunkMesh(const std::vector<VertexData>& vertices, const std::vector<GLuint>& indices);
 		~ChunkMesh();
 
 		// Disable copy constructors. Since VAOs, VBOs, and EBOs cannot be copied, neither can a mesh.
@@ -17,22 +26,26 @@ namespace Graphics {
 		ChunkMesh& operator=(const ChunkMesh&) = delete;
 
 		ChunkMesh(ChunkMesh&& other) noexcept :
-			vertexArrayObject(std::move(other.vertexArrayObject)),
-			vertexBufferObject(std::move(other.vertexBufferObject)),
-			elementBufferObject(std::move(other.elementBufferObject)),
+			vao(std::move(other.vao)),
+			vbo(std::move(other.vbo)),
+			ebo(std::move(other.ebo)),
 			indexCount(other.indexCount)
 		{}
 
 		// Cannot move assign a ChunkMesh, as it would invalidate indexCount
 		ChunkMesh& operator=(ChunkMesh&&) = delete;
 
+		static void LoadTextureAtlas(const char* textureAtlas);
+
 		void Draw() const;
 
 	private:
-		VAO vertexArrayObject;
-		VBO vertexBufferObject;
-		EBO elementBufferObject;
+		VAO vao;
+		VBO vbo;
+		EBO ebo;
 
 		const int indexCount;
+
+		inline static GLuint textureAtlasId;
 	};
 }
