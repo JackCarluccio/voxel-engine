@@ -45,10 +45,10 @@ add_executable(VoxelEngine
     "src/graphics/VBO.cpp"
     "src/graphics/EBO.cpp"
     "src/graphics/ChunkMesh.cpp"
-    "src/worldGen/Chunk.cpp"
+    
     "src/worldGen/WorldGen.cpp"
     "include/worldGen/Computed.h"
-    "src/worldGen/PerlinNoise.cpp")
+    "src/worldGen/PerlinNoise.cpp" )
 
 # Include directories
 target_include_directories(VoxelEngine 

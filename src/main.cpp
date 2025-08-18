@@ -9,6 +9,7 @@
 #include <vector>
 #include <chrono>
 #include <iostream>
+#include <unordered_map>
 
 #include "graphics/ShaderProgram.h"
 #include "graphics/ChunkMesh.h"
@@ -18,6 +19,17 @@
 struct ChunkInfo {
     WorldGen::Chunk chunk;
     Graphics::ChunkMesh mesh;
+};
+
+struct IVec2Hash {
+    std::size_t operator()(const glm::ivec2& key) const noexcept {
+        return std::hash<int>()(key.x) ^ (std::hash<int>()(key.y) << 1);
+    }
+};
+struct IVec2Equal {
+    bool operator()(const glm::ivec2& a, const glm::ivec2& b) const noexcept {
+        return a.x == b.x && a.y == b.y;
+    }
 };
 
 float aspectRatio = 1920.0f / 1080.0f;
@@ -225,13 +237,13 @@ int main() {
     // Create and use shader program
 	Graphics::ShaderProgram shaderProgram("default.vert", "default.frag");
 
-    std::vector<ChunkInfo> chunks;
+    std::unordered_map<glm::ivec2, ChunkInfo, IVec2Hash, IVec2Equal> chunks;
     for (int x = -10; x <= 10; x++)
     for (int z = -10; z <= 10; z++) {
         glm::ivec2 chunkCoordinate(x, z);
 		WorldGen::Chunk chunk = WorldGen::GenerateChunk(chunkCoordinate);
-		Graphics::ChunkMesh mesh = chunk.BuildMesh();
-		chunks.emplace_back(std::move(chunk), std::move(mesh));
+		Graphics::ChunkMesh mesh = Graphics::ChunkMesh::BuildChunkMesh(chunk);
+		chunks.insert({ chunkCoordinate, {std::move(chunk), std::move(mesh)}});
     }
 
     int frameCount = 0;
@@ -266,11 +278,10 @@ int main() {
 
         GLuint modelLocation = glGetUniformLocation(shaderProgram.GetId(), "model");
 
-        for (const ChunkInfo& chunk : chunks) {
-			glm::ivec2 chunkPosition = chunk.chunk.position;
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(chunkPosition.x * WorldGen::width, 0, chunkPosition.y * WorldGen::width));
+        for (const auto& [coord, chunkInfo]: chunks) {
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * WorldGen::width, 0, coord.y * WorldGen::width));
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-			chunk.mesh.Draw();
+			chunkInfo.mesh.Draw();
         }
 
         glfwSwapBuffers(window);

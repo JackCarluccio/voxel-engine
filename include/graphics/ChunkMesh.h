@@ -10,6 +10,8 @@
 #include "graphics/EBO.h"
 #include "graphics/stb_image.h"
 
+#include "worldGen/Chunk.h"
+
 namespace Graphics {
 	struct VertexData {
 		GLint index;
@@ -36,6 +38,9 @@ namespace Graphics {
 		ChunkMesh& operator=(ChunkMesh&&) = delete;
 
 		static void LoadTextureAtlas(const char* textureAtlas);
+
+		// Builds the ChunkMesh for the chunk
+		static ChunkMesh BuildChunkMesh(const WorldGen::Chunk& chunk);
 
 		void Draw() const;
 

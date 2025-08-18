@@ -2,8 +2,9 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+
 #include <vector>
-#include "graphics/ChunkMesh.h"
+
 #include "worldGen/Computed.h"
 
 namespace WorldGen {
@@ -48,7 +49,5 @@ namespace WorldGen {
 			int index = IndexFromXYZ(x, y, z);
 			SetBlock(index, block);
 		};
-
-		Graphics::ChunkMesh BuildMesh() const;
 	};
 }
