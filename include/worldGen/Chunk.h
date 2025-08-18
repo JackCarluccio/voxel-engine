@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <iostream>
 
 #include "worldGen/Computed.h"
 
@@ -19,6 +20,9 @@ namespace WorldGen {
 		std::vector<uint8_t> blocks;
 
 		Chunk(const glm::ivec2& p) : position(p), blocks(volume) {};
+		Chunk() : position(glm::ivec2(0, 0)), blocks(volume) {
+			std::cout << "Warning: Default Chunk constructor called. This should not happen!" << std::endl;
+		};
 
 		// Disable copying.
 		Chunk(const Chunk&) = delete;

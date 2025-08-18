@@ -149,10 +149,11 @@ namespace Graphics {
 		BuildMeshCap(vertices, indices, chunk, true); // Top of the chunk
 		BuildMeshCap(vertices, indices, chunk, false); // Bottom of the chunk
 
-		return ChunkMesh(vertices, indices);
+		return ChunkMesh(chunk.position, vertices, indices);
 	}
 
-	ChunkMesh::ChunkMesh(const std::vector<VertexData>& vertices, const std::vector<GLuint>& indices):
+	ChunkMesh::ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<VertexData>& vertices, const std::vector<GLuint>& indices):
+		chunkCoord(chunkCoord),
 		vao(),
 		vbo(vertices.size() * sizeof(VertexData), vertices.data()),
 		ebo(indices.size() * sizeof(GLuint), indices.data()),

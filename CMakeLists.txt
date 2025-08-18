@@ -48,7 +48,7 @@ add_executable(VoxelEngine
     
     "src/worldGen/WorldGen.cpp"
     "include/worldGen/Computed.h"
-    "src/worldGen/PerlinNoise.cpp" )
+    "src/worldGen/PerlinNoise.cpp"  "include/worldGen/ChunkManager.h" "src/worldGen/ChunkManager.cpp")
 
 # Include directories
 target_include_directories(VoxelEngine 

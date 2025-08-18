@@ -15,21 +15,11 @@
 #include "graphics/ChunkMesh.h"
 #include "worldGen/Chunk.h"
 #include "worldGen/WorldGen.h"
+#include "worldGen/ChunkManager.h"
 
 struct ChunkInfo {
     WorldGen::Chunk chunk;
     Graphics::ChunkMesh mesh;
-};
-
-struct IVec2Hash {
-    std::size_t operator()(const glm::ivec2& key) const noexcept {
-        return std::hash<int>()(key.x) ^ (std::hash<int>()(key.y) << 1);
-    }
-};
-struct IVec2Equal {
-    bool operator()(const glm::ivec2& a, const glm::ivec2& b) const noexcept {
-        return a.x == b.x && a.y == b.y;
-    }
 };
 
 float aspectRatio = 1920.0f / 1080.0f;
@@ -237,13 +227,9 @@ int main() {
     // Create and use shader program
 	Graphics::ShaderProgram shaderProgram("default.vert", "default.frag");
 
-    std::unordered_map<glm::ivec2, ChunkInfo, IVec2Hash, IVec2Equal> chunks;
     for (int x = -10; x <= 10; x++)
     for (int z = -10; z <= 10; z++) {
-        glm::ivec2 chunkCoordinate(x, z);
-		WorldGen::Chunk chunk = WorldGen::GenerateChunk(chunkCoordinate);
-		Graphics::ChunkMesh mesh = Graphics::ChunkMesh::BuildChunkMesh(chunk);
-		chunks.insert({ chunkCoordinate, {std::move(chunk), std::move(mesh)}});
+        WorldGen::ChunkManager::CreateChunk(glm::ivec2(x, z));
     }
 
     int frameCount = 0;
@@ -278,10 +264,10 @@ int main() {
 
         GLuint modelLocation = glGetUniformLocation(shaderProgram.GetId(), "model");
 
-        for (const auto& [coord, chunkInfo]: chunks) {
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * WorldGen::width, 0, coord.y * WorldGen::width));
+        for (const auto& [coord, mesh]: WorldGen::ChunkManager::meshes) {
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(mesh.chunkCoord.x * WorldGen::width, 0, mesh.chunkCoord.y * WorldGen::width));
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-			chunkInfo.mesh.Draw();
+			mesh.Draw();
         }
 
         glfwSwapBuffers(window);

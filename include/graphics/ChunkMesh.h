@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include <vector>
 #include <iostream>
@@ -20,7 +21,9 @@ namespace Graphics {
 
 	class ChunkMesh {
 	public:
-		ChunkMesh(const std::vector<VertexData>& vertices, const std::vector<GLuint>& indices);
+		const glm::ivec2 chunkCoord;
+
+		ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<VertexData>& vertices, const std::vector<GLuint>& indices);
 		~ChunkMesh();
 
 		// Disable copy constructors. Since VAOs, VBOs, and EBOs cannot be copied, neither can a mesh.
@@ -28,6 +31,7 @@ namespace Graphics {
 		ChunkMesh& operator=(const ChunkMesh&) = delete;
 
 		ChunkMesh(ChunkMesh&& other) noexcept :
+			chunkCoord(other.chunkCoord),
 			vao(std::move(other.vao)),
 			vbo(std::move(other.vbo)),
 			ebo(std::move(other.ebo)),
