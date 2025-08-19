@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 
 #include <vector>
-#include <iostream>
 
 #include "worldGen/Computed.h"
 
@@ -16,13 +15,35 @@ namespace WorldGen {
 			return z + x * width + y * area;
 		}
 
+		// Checks if the block is within the bounds of a chunk
+		static constexpr bool InBounds(int x, int y, int z) noexcept {
+			return x >= 0 && x < WorldGen::width && y >= 0 && y < WorldGen::height && z >= 0 && z < WorldGen::width;
+		}
+		// Checks if the block is an interior block of a chunk
+		static constexpr bool IsInterior(int x, int y, int z) noexcept {
+			return x > 0 && x < WorldGen::width - 1 && y > 0 && y < WorldGen::height - 1 && z > 0 && z < WorldGen::width - 1;
+		}
+		// Checks if the block is an exterior block of the chunk
+		static constexpr bool IsExterior(int x, int y, int z) noexcept {
+			return !IsInterior(x, y, z) && InBounds(x, y, z);
+		}
+		// Checks if the block on this face of a block is in bounds
+		static constexpr bool IsBlockFaceInBounds(int x, int y, int z, int face) noexcept {
+			return IsInterior(x, y, z) || (InBounds(x, y, z) && !(
+				(z == 0 && face == 0) ||
+				(z == WorldGen::width - 1 && face == 1) ||
+				(x == 0 && face == 2) ||
+				(x == WorldGen::width - 1 && face == 3) ||
+				(y == 0 && face == 4) ||
+				(y == WorldGen::height - 1 && face == 5)
+			));
+		}
+
 		const glm::ivec2 position;
 		std::vector<uint8_t> blocks;
 
 		Chunk(const glm::ivec2& p) : position(p), blocks(volume) {};
-		Chunk() : position(glm::ivec2(0, 0)), blocks(volume) {
-			std::cout << "Warning: Default Chunk constructor called. This should not happen!" << std::endl;
-		};
+		Chunk() : position(glm::ivec2(0, 0)), blocks(volume) { };
 
 		// Disable copying.
 		Chunk(const Chunk&) = delete;

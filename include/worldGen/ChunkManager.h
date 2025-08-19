@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 
+#include <array>
 #include <unordered_map>
 
 #include "worldGen/Chunk.h"
@@ -25,6 +26,7 @@ namespace WorldGen::ChunkManager {
 	extern std::unordered_map<glm::ivec2, Graphics::ChunkMesh, IVec2Hash, IVec2Equal> meshes;
 
 	bool HasAllNeighbors(const glm::ivec2& chunkCoord) noexcept;
+	std::array<WorldGen::Chunk*, 4> GetNeighbors(const glm::ivec2& chunkCoord) noexcept;
 
 	inline bool DoesChunkExist(const glm::ivec2& chunkCoord) noexcept {
 		return chunks.find(chunkCoord) != chunks.end();

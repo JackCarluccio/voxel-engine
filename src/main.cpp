@@ -220,7 +220,7 @@ int main() {
     // Make sure triangles don't render over each other
     glEnable(GL_DEPTH_TEST);
 
-    Graphics::ChunkMesh::LoadTextureAtlas("../../../assets/texture_atlas.png");
+    Graphics::ChunkMesh::Initialize();
 
 	glfwSetKeyCallback(window, KeyCallback);
 

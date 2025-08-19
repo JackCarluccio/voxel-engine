@@ -23,6 +23,11 @@ namespace Graphics {
 	public:
 		const glm::ivec2 chunkCoord;
 
+		static void Initialize();
+
+		// Builds the ChunkMesh for the chunk
+		static ChunkMesh BuildChunkMesh(const WorldGen::Chunk& chunk, const WorldGen::Chunk* const* neighbors);
+
 		ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<VertexData>& vertices, const std::vector<GLuint>& indices);
 		~ChunkMesh();
 
@@ -40,11 +45,6 @@ namespace Graphics {
 
 		// Cannot move assign a ChunkMesh, as it would invalidate indexCount
 		ChunkMesh& operator=(ChunkMesh&&) = delete;
-
-		static void LoadTextureAtlas(const char* textureAtlas);
-
-		// Builds the ChunkMesh for the chunk
-		static ChunkMesh BuildChunkMesh(const WorldGen::Chunk& chunk);
 
 		void Draw() const;
 

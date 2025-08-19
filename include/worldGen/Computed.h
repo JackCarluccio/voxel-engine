@@ -9,6 +9,9 @@ namespace WorldGen {
 	inline constexpr int area = width * width;
 	inline constexpr int volume = area * height;
 
+	inline constexpr int interiorVolume = (width - 2) * (width - 2) * (height - 2);
+	inline constexpr int exteriorVolume = volume - interiorVolume;
+
 	// How much to offset the index to get to a neighbor block
 	inline constexpr int neighborIndexOffsets[6] = {
 		-1, 1,
