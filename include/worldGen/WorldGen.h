@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "worldGen/Chunk.h"
+#include "worldGen/Blocks.h"
 #include "worldGen/Computed.h"
 #include "worldGen/PerlinNoise.h"
 

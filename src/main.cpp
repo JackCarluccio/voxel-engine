@@ -225,7 +225,7 @@ int main() {
 	glfwSetKeyCallback(window, KeyCallback);
 
     // Create and use shader program
-	Graphics::ShaderProgram shaderProgram("default.vert", "default.frag");
+	Graphics::ShaderProgram shaderProgram("chunk_mesh_vert.glsl", "chunk_mesh_frag.glsl");
 
     for (int x = -10; x <= 10; x++)
     for (int z = -10; z <= 10; z++) {

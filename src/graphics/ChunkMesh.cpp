@@ -13,40 +13,40 @@ struct FaceVertexInfo {
 };
 constexpr FaceVertexInfo faceVertexInfo[6][4] = {
 	{ // Back face
-		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.00f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.25f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.25f, 0.00f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.00f, 0.00f },
+		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.0000f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.0625f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.0625f, 0.0000f },
+		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.0000f, 0.0000f },
 	},
 	{ // Front face
-		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.00f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.25f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.25f, 0.00f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.00f, 0.00f },
+		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.0000f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.0625f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.0625f, 0.0000f },
+		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.0000f, 0.0000f },
 	},
 	{ // Right face ( cuz someone decided to flip x axis )
-		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.00f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.25f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.25f, 0.00f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.00f, 0.00f },
+		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.0000f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.0625f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.0625f, 0.0000f },
+		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.0000f, 0.0000f },
 	},
 	{ // Left face ( cuz someone decided to flip x axis )
-		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.00f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.25f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.25f, 0.00f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.00f, 0.00f },
+		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.0000f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.0625f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.0625f, 0.0000f },
+		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.0000f, 0.0000f },
 	},
 	{ // Bottom face
-		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.00f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.25f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.25f, 0.00f },
-		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.00f, 0.00f },
+		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.0000f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.0625f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.0625f, 0.0000f },
+		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.0000f, 0.0000f },
 	},
 	{ // Top face
-		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.00f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.25f, 0.25f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.25f, 0.00f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.00f, 0.00f },
+		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.0000f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.0625f, 0.0625f },
+		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.0625f, 0.0000f },
+		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.0000f, 0.0000f },
 	}
 };
 
@@ -72,13 +72,14 @@ ExteriorBlockBlueprint exteriorBlockBlueprints[WorldGen::exteriorVolume];
 ExteriorBlueprint exteriorBlueprints[4][WorldGen::width * WorldGen::height];
 
 // Constructs the triangles for a face of a block
-void AddFace(std::vector<Graphics::VertexData>& vertices, std::vector<GLuint>& indices, int face, int vertexIndexOrigin) {
+void AddFace(int blockId, std::vector<Graphics::VertexData>& vertices, std::vector<GLuint>& indices, int face, int vertexIndexOrigin) {
 	// Add each vertex
 	for (int j = 0; j < 4; j++) {
 		FaceVertexInfo info = faceVertexInfo[face][j];
 		vertices.emplace_back(
 			vertexIndexOrigin + info.vertexIndexOffset,
-			info.u, info.v
+			info.u + WorldGen::Blocks::blockData[blockId].u,
+			info.v + WorldGen::Blocks::blockData[blockId].v
 		);
 	}
 
@@ -99,7 +100,8 @@ void BuildMeshInteriorBlocks(std::vector<Graphics::VertexData>& vertices, std::v
 	for (int z = 1; z < WorldGen::width - 1; z++) {
 		// If this block is air, there's nothing to construct
 		int index = WorldGen::Chunk::IndexFromXYZ(x, y, z);
-		if (chunk.GetBlock(index) == 0)
+		int blockId = chunk.GetBlock(index);
+		if (blockId == WorldGen::Blocks::AIR)
 			continue;
 
 		// Construct each face
@@ -107,10 +109,10 @@ void BuildMeshInteriorBlocks(std::vector<Graphics::VertexData>& vertices, std::v
 		for (int face = 0; face < 6; face++) {
 			// Only construct this face if not occluded
 			int neighborIndex = index + WorldGen::neighborIndexOffsets[face];
-			if (chunk.GetBlock(neighborIndex) != 0)
+			if (chunk.GetBlock(neighborIndex) != WorldGen::Blocks::AIR)
 				continue;
 
-			AddFace(vertices, indices, face, vertexIndexOrigin);
+			AddFace(blockId, vertices, indices, face, vertexIndexOrigin);
 		}
 	}
 }
@@ -119,16 +121,17 @@ void BuildMeshInteriorBlocks(std::vector<Graphics::VertexData>& vertices, std::v
 void BuildMeshExteriorBlocks(std::vector<Graphics::VertexData>& vertices, std::vector<GLuint>& indices, const WorldGen::Chunk& chunk) {
 	for (const ExteriorBlockBlueprint& blockBlueprint : exteriorBlockBlueprints) {
 		// If this block is air, there's nothing to construct
-		if (chunk.GetBlock(blockBlueprint.thisIndex) == 0)
+		int blockId = chunk.GetBlock(blockBlueprint.thisIndex);
+		if (blockId == WorldGen::Blocks::AIR)
 			continue;
 
 		for (int i = 0; i < blockBlueprint.numFaces; i++) {
 			const ExteriorBlockFaceBlueprint& faceBlueprint = blockBlueprint.faceBlueprints[i];
 			// Only construct this face if not occluded
-			if (chunk.GetBlock(faceBlueprint.thatIndex) != 0)
+			if (chunk.GetBlock(faceBlueprint.thatIndex) != WorldGen::Blocks::AIR)
 				continue;
 
-			AddFace(vertices, indices, faceBlueprint.face, blockBlueprint.vertexIndexOrigin);
+			AddFace(blockId, vertices, indices, faceBlueprint.face, blockBlueprint.vertexIndexOrigin);
 		}
 	}
 }
@@ -148,10 +151,11 @@ void BuildMeshCap(std::vector<Graphics::VertexData>& vertices, std::vector<GLuin
 	for (int x = 0; x < WorldGen::width; x++)
 	for (int z = 0; z < WorldGen::width; z++) {
 		// If this block is air, there's nothing to construct
-		if (chunk.GetBlock(x, y, z) == 0)
+		int blockId = chunk.GetBlock(x, y, z);
+		if (blockId == WorldGen::Blocks::AIR)
 			continue;
 
-		AddFace(vertices, indices, face, GetVertexIndex(x, y, z));
+		AddFace(blockId, vertices, indices, face, GetVertexIndex(x, y, z));
 	}
 }
 
@@ -163,14 +167,15 @@ void BuildMeshExterior(
 ) {
 	for (const ExteriorBlueprint& blueprint : exteriorBlueprints[face]) {
 		// If this block is air, there's nothing to construct
-		if (chunk.GetBlock(blueprint.thisIndex) == 0)
+		int blockId = chunk.GetBlock(blueprint.thisIndex);
+		if (blockId == WorldGen::Blocks::AIR)
 			continue;
 
 		// Only construct this face if not occluded
-		if (exteriorChunk.GetBlock(blueprint.thatIndex) != 0)
+		if (exteriorChunk.GetBlock(blueprint.thatIndex) != WorldGen::Blocks::AIR)
 			continue;
 		
-		AddFace(vertices, indices, face, blueprint.vertexIndexOrigin);
+		AddFace(blockId, vertices, indices, face, blueprint.vertexIndexOrigin);
 	}
 }
 

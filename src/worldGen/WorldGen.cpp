@@ -26,8 +26,20 @@ namespace WorldGen {
 		for (int x = 0; x < width; x++)
 		for (int z = 0; z < width; z++) {
 			int height = heightMap[z + x * width];
-			for (int y = 0; y < height; y++) {
-				chunk.SetBlock(x, y, z, 1);
+
+			// Set surface block
+			if (height > 0) {
+				chunk.SetBlock(x, height - 1, z, Blocks::GRASS);
+			}
+			
+			// Set subsurface blocks
+			for (int y = height - 4; y < height - 1; y++) {
+				chunk.SetBlock(x, y, z, Blocks::DIRT);
+			}
+
+			// Set all stone blocks
+			for (int y = 0; y < height - 4; y++) {
+				chunk.SetBlock(x, y, z, Blocks::STONE);
 			}
 		}
 

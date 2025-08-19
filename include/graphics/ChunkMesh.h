@@ -12,6 +12,7 @@
 #include "graphics/stb_image.h"
 
 #include "worldGen/Chunk.h"
+#include "worldGen/Blocks.h"
 
 namespace Graphics {
 	struct VertexData {
