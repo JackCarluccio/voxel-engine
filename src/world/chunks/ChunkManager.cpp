@@ -1,23 +1,24 @@
-#include "worldGen/ChunkManager.h"
+#include "world/chunks/ChunkManager.h"
 
-bool AttemptMeshCreation(const WorldGen::Chunk& chunk) {
+bool AttemptMeshCreation(const World::Chunks::Chunk& chunk) {
 	// All neighbors must exist to construct a mesh
-	if (!WorldGen::ChunkManager::HasAllNeighbors(chunk.position))
+	if (!World::Chunks::ChunkManager::HasAllNeighbors(chunk.position))
 		return false;
 
-	std::array<WorldGen::Chunk*, 4> neighbors = WorldGen::ChunkManager::GetNeighbors(chunk.position);
+	std::array<World::Chunks::Chunk*, 4> neighbors = World::Chunks::ChunkManager::GetNeighbors(chunk.position);
 	Graphics::ChunkMesh mesh = Graphics::ChunkMesh::BuildChunkMesh(chunk, neighbors.data());
-	WorldGen::ChunkManager::meshes.insert({ chunk.position, std::move(mesh) });
+	World::Chunks::ChunkManager::meshes.insert({ chunk.position, std::move(mesh) });
 	return true;
 }
+ 
+namespace World::Chunks::ChunkManager {
 
-namespace WorldGen::ChunkManager {
-	std::unordered_map<glm::ivec2, WorldGen::Chunk, IVec2Hash, IVec2Equal> chunks;
+	std::unordered_map<glm::ivec2, Chunk, IVec2Hash, IVec2Equal> chunks;
 	std::unordered_map<glm::ivec2, Graphics::ChunkMesh, IVec2Hash, IVec2Equal> meshes;
 
 	// Checks if a chunk has all 4 neighbors loaded
 	bool HasAllNeighbors(const glm::ivec2& chunkCoord) noexcept {
-		for (const glm::ivec2& offset : WorldGen::chunkOffsets) {
+		for (const glm::ivec2& offset : chunkOffsets) {
 			glm::ivec2 neighborCoord = chunkCoord + offset;
 			if (chunks.find(neighborCoord) == chunks.end()) {
 				return false;
@@ -28,8 +29,8 @@ namespace WorldGen::ChunkManager {
 	}
 
 	// Get pointers to the neighboring 4 chunks from the specified chunk. Nullptr if they don't exist
-	std::array<WorldGen::Chunk*, 4> GetNeighbors(const glm::ivec2& chunkCoord) noexcept {
-		std::array<WorldGen::Chunk*, 4> ptrs = { nullptr, nullptr, nullptr, nullptr };
+	std::array<Chunk*, 4> GetNeighbors(const glm::ivec2& chunkCoord) noexcept {
+		std::array<Chunk*, 4> ptrs = { nullptr, nullptr, nullptr, nullptr };
 		for (int i = 0; i < 4; i++) {
 			glm::ivec2 neighborCoord = chunkCoord + chunkOffsets[i];
 			auto it = chunks.find(neighborCoord);
@@ -48,12 +49,12 @@ namespace WorldGen::ChunkManager {
 			return false;
 		}
 
-		chunks.insert({ chunkCoord, WorldGen::GenerateChunk(chunkCoord) });
-		WorldGen::Chunk& chunk = chunks[chunkCoord];
+		chunks.insert({ chunkCoord, Generation::Generator::GenerateChunk(chunkCoord) });
+		Chunk& chunk = chunks[chunkCoord];
 
 		AttemptMeshCreation(chunk);
 		// Neighboring chunks might have been waiting for this chunk, to create their meshes
-		for (const glm::ivec2& offset : WorldGen::chunkOffsets) {
+		for (const glm::ivec2& offset : chunkOffsets) {
 			glm::ivec2 neighborCoord = chunkCoord + offset;
 			if (DoesChunkExist(neighborCoord) && !DoesChunkMeshExist(neighborCoord)) {
 				AttemptMeshCreation(chunks[neighborCoord]);
@@ -62,4 +63,5 @@ namespace WorldGen::ChunkManager {
 
 		return true;
 	}
+
 }

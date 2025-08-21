@@ -13,12 +13,12 @@
 
 #include "graphics/ShaderProgram.h"
 #include "graphics/ChunkMesh.h"
-#include "worldGen/Chunk.h"
-#include "worldGen/WorldGen.h"
-#include "worldGen/ChunkManager.h"
+#include "world/chunks/Chunk.h"
+#include "world/chunks/ChunkManager.h"
+#include "world/generation/Generator.h"
 
 struct ChunkInfo {
-    WorldGen::Chunk chunk;
+    World::Chunks::Chunk chunk;
     Graphics::ChunkMesh mesh;
 };
 
@@ -229,7 +229,7 @@ int main() {
 
     for (int x = -10; x <= 10; x++)
     for (int z = -10; z <= 10; z++) {
-        WorldGen::ChunkManager::CreateChunk(glm::ivec2(x, z));
+        World::Chunks::ChunkManager::CreateChunk(glm::ivec2(x, z));
     }
 
     int frameCount = 0;
@@ -264,8 +264,8 @@ int main() {
 
         GLuint modelLocation = glGetUniformLocation(shaderProgram.GetId(), "model");
 
-        for (const auto& [coord, mesh]: WorldGen::ChunkManager::meshes) {
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(mesh.chunkCoord.x * WorldGen::width, 0, mesh.chunkCoord.y * WorldGen::width));
+        for (const auto& [coord, mesh] : World::Chunks::ChunkManager::meshes) {
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(mesh.chunkCoord.x * World::Chunks::width, 0, mesh.chunkCoord.y * World::Chunks::width));
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 			mesh.Draw();
         }

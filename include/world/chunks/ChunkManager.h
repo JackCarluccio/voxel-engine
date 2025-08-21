@@ -5,10 +5,9 @@
 #include <array>
 #include <unordered_map>
 
-#include "worldGen/Chunk.h"
-#include "worldGen/WorldGen.h"
-#include "worldGen/Computed.h"
 #include "graphics/ChunkMesh.h"
+#include "world/chunks/Chunk.h"
+#include "world/generation/Generator.h"
 
 struct IVec2Hash {
 	std::size_t operator()(const glm::ivec2& key) const noexcept {
@@ -21,12 +20,13 @@ struct IVec2Equal {
 	}
 };
 
-namespace WorldGen::ChunkManager {
-	extern std::unordered_map<glm::ivec2, WorldGen::Chunk, IVec2Hash, IVec2Equal> chunks;
+namespace World::Chunks::ChunkManager {
+
+	extern std::unordered_map<glm::ivec2, Chunks::Chunk, IVec2Hash, IVec2Equal> chunks;
 	extern std::unordered_map<glm::ivec2, Graphics::ChunkMesh, IVec2Hash, IVec2Equal> meshes;
 
 	bool HasAllNeighbors(const glm::ivec2& chunkCoord) noexcept;
-	std::array<WorldGen::Chunk*, 4> GetNeighbors(const glm::ivec2& chunkCoord) noexcept;
+	std::array<Chunks::Chunk*, 4> GetNeighbors(const glm::ivec2& chunkCoord) noexcept;
 
 	inline bool DoesChunkExist(const glm::ivec2& chunkCoord) noexcept {
 		return chunks.find(chunkCoord) != chunks.end();
@@ -36,4 +36,5 @@ namespace WorldGen::ChunkManager {
 	}
 
 	bool CreateChunk(const glm::ivec2& chunkCoord);
+
 }

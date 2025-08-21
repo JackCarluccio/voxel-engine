@@ -11,10 +11,11 @@
 #include "graphics/EBO.h"
 #include "graphics/stb_image.h"
 
-#include "worldGen/Chunk.h"
-#include "worldGen/Blocks.h"
+#include "world/blocks/Blocks.h"
+#include "world/chunks/Chunk.h"
 
 namespace Graphics {
+
 	struct VertexData {
 		GLint index;
 		GLfloat u, v;
@@ -27,7 +28,7 @@ namespace Graphics {
 		static void Initialize();
 
 		// Builds the ChunkMesh for the chunk
-		static ChunkMesh BuildChunkMesh(const WorldGen::Chunk& chunk, const WorldGen::Chunk* const* neighbors);
+		static ChunkMesh BuildChunkMesh(const World::Chunks::Chunk& chunk, const World::Chunks::Chunk* const* neighbors);
 
 		ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<VertexData>& vertices, const std::vector<GLuint>& indices);
 		~ChunkMesh();
@@ -58,4 +59,5 @@ namespace Graphics {
 
 		inline static GLuint textureAtlasId;
 	};
+
 }

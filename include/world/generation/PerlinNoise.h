@@ -2,8 +2,9 @@
 
 #include <cmath>
 
-namespace WorldGen {
-	extern constexpr float GetMaxNoise(int octaves, float persistence) noexcept;
+namespace World::Generation::PerlinNoise {
+	
+	float Sample2d(float x, float y) noexcept;
 
 	class PerlinNoise2d {
 	public:
@@ -19,5 +20,4 @@ namespace WorldGen {
 		const float maxNoise;
 	};
 
-	float Sample2d(float x, float y) noexcept;
 }
