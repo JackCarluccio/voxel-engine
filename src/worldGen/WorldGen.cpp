@@ -1,6 +1,6 @@
 #include "worldGen/WorldGen.h"
 
-using namespace WorldGen;
+WorldGen::PerlinNoise2d terrainNoise(4, 2.0f, 0.5f);
 
 namespace WorldGen {
 	Chunk GenerateChunk(const glm::ivec2& position) {
@@ -13,7 +13,7 @@ namespace WorldGen {
 		int heightMap[area];
 		for (int x = 0; x < width; x++)
 		for (int z = 0; z < width; z++) {
-			float noise = PerlinNoise2d(
+			float noise = terrainNoise.Sample(
 				static_cast<float>(chunkWorldX + x) / 128.0f,
 				static_cast<float>(chunkWorldZ + z) / 128.0f
 			);

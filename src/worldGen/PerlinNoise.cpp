@@ -9,7 +9,7 @@ struct Vector2 {
 };
 
 // Cubic interpolation
-float Interpolate(float a, float b, float t) noexcept {
+constexpr float Interpolate(float a, float b, float t) noexcept {
 	return (b - a) * (3.0f - t * 2.0f) * t * t + a;
 }
 
@@ -43,7 +43,35 @@ float DotGridGradient(int cellX, int cellY, float x, float y) noexcept {
     return (dx * gradient.x + dy * gradient.y);
 }
 
-float WorldGen::PerlinNoise2d(float x, float y) noexcept {
+
+constexpr float WorldGen::GetMaxNoise(int octaves, float persistence) noexcept {
+	float maxNoise = 1.0f;
+	float amplitude = 1.0f;
+	for (int i = 1; i < octaves; i++) {
+		amplitude *= persistence;
+		maxNoise += amplitude;
+	}
+
+	return maxNoise;
+}
+
+WorldGen::PerlinNoise2d::PerlinNoise2d(int octaves, float lacunarity, float persistence)
+	: octaves(octaves), lacunarity(lacunarity), persistence(persistence), maxNoise(WorldGen::GetMaxNoise(octaves, persistence)) {}
+
+float WorldGen::PerlinNoise2d::Sample(float x, float y) const noexcept {
+	float total = 0.0f;
+	float frequency = 1.0f;
+	float amplitude = 1.0f;
+	for (int i = 0; i < octaves; i++) {
+		total += WorldGen::Sample2d(x * frequency, y * frequency) * amplitude;
+		frequency *= lacunarity;
+		amplitude *= persistence;
+	}
+
+	return total / maxNoise;
+}
+
+float WorldGen::Sample2d(float x, float y) noexcept {
 	// Surrounding grid points
 	int x0 = static_cast<int>(floor(x));
 	int y0 = static_cast<int>(floor(y));
