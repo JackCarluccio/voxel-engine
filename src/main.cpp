@@ -39,6 +39,8 @@ bool isDHeld = false;
 bool isQHeld = false;
 bool isEHeld = false;
 
+constexpr int renderDistance = 10;
+
 
 // Window resize callback
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -227,8 +229,8 @@ int main() {
     // Create and use shader program
 	Graphics::ShaderProgram shaderProgram("chunk_mesh_vert.glsl", "chunk_mesh_frag.glsl");
 
-    for (int x = -10; x <= 10; x++)
-    for (int z = -10; z <= 10; z++) {
+    for (int x = -renderDistance; x <= renderDistance; x++)
+    for (int z = -renderDistance; z <= renderDistance; z++) {
         World::Chunks::ChunkManager::CreateChunk(glm::ivec2(x, z));
     }
 

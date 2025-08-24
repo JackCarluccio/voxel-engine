@@ -1,8 +1,11 @@
 #pragma once
 
+#include <cstdint>
+
 namespace World::Blocks {
+
 	struct BlockData {
-		float u, v;
+		uint32_t atlasIndex;
 	};
 
 	enum BlockType : int {

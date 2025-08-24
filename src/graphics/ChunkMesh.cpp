@@ -7,46 +7,42 @@ constexpr int GetVertexIndex(int x, int y, int z) noexcept {
 	return z + x * vertexWidth + y * vertexArea;
 }
 
-struct FaceVertexInfo {
-	const GLuint vertexIndexOffset;
-	const GLfloat u, v;
-};
-constexpr FaceVertexInfo faceVertexInfo[6][4] = {
+constexpr uint32_t faceVertexIndexOffsets[6][4] = {
 	{ // Back face
-		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.0000f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.0625f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.0625f, 0.0000f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.0000f, 0.0000f },
+		GetVertexIndex(1, 0, 0),
+		GetVertexIndex(0, 0, 0),
+		GetVertexIndex(0, 1, 0),
+		GetVertexIndex(1, 1, 0),
 	},
 	{ // Front face
-		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.0000f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.0625f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.0625f, 0.0000f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.0000f, 0.0000f },
+		GetVertexIndex(0, 0, 1),
+		GetVertexIndex(1, 0, 1),
+		GetVertexIndex(1, 1, 1),
+		GetVertexIndex(0, 1, 1),
 	},
 	{ // Right face ( cuz someone decided to flip x axis )
-		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.0000f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.0625f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.0625f, 0.0000f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.0000f, 0.0000f },
+		GetVertexIndex(0, 0, 0),
+		GetVertexIndex(0, 0, 1),
+		GetVertexIndex(0, 1, 1),
+		GetVertexIndex(0, 1, 0),
 	},
 	{ // Left face ( cuz someone decided to flip x axis )
-		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.0000f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.0625f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.0625f, 0.0000f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.0000f, 0.0000f },
+		GetVertexIndex(1, 0, 1),
+		GetVertexIndex(1, 0, 0),
+		GetVertexIndex(1, 1, 0),
+		GetVertexIndex(1, 1, 1),
 	},
 	{ // Bottom face
-		FaceVertexInfo{ GetVertexIndex(1, 0, 1), 0.0000f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(0, 0, 1), 0.0625f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(0, 0, 0), 0.0625f, 0.0000f },
-		FaceVertexInfo{ GetVertexIndex(1, 0, 0), 0.0000f, 0.0000f },
+		GetVertexIndex(1, 0, 1),
+		GetVertexIndex(0, 0, 1),
+		GetVertexIndex(0, 0, 0),
+		GetVertexIndex(1, 0, 0),
 	},
 	{ // Top face
-		FaceVertexInfo{ GetVertexIndex(1, 1, 0), 0.0000f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 0), 0.0625f, 0.0625f },
-		FaceVertexInfo{ GetVertexIndex(0, 1, 1), 0.0625f, 0.0000f },
-		FaceVertexInfo{ GetVertexIndex(1, 1, 1), 0.0000f, 0.0000f },
+		GetVertexIndex(1, 1, 0),
+		GetVertexIndex(0, 1, 0),
+		GetVertexIndex(0, 1, 1),
+		GetVertexIndex(1, 1, 1),
 	}
 };
 
@@ -72,15 +68,13 @@ ExteriorBlockBlueprint exteriorBlockBlueprints[World::Chunks::exteriorVolume];
 ExteriorBlueprint exteriorBlueprints[4][World::Chunks::width * World::Chunks::height];
 
 // Constructs the triangles for a face of a block
-void AddFace(int blockId, std::vector<Graphics::VertexData>& vertices, std::vector<GLuint>& indices, int face, int vertexIndexOrigin) {
+void AddFace(int blockId, std::vector<uint32_t>& vertices, std::vector<GLuint>& indices, int face, int vertexIndexOrigin) {
 	// Add each vertex
 	for (int j = 0; j < 4; j++) {
-		FaceVertexInfo info = faceVertexInfo[face][j];
-		vertices.emplace_back(
-			vertexIndexOrigin + info.vertexIndexOffset,
-			info.u + World::Blocks::blockData[blockId].u,
-			info.v + World::Blocks::blockData[blockId].v
-		);
+		uint32_t data = vertexIndexOrigin + faceVertexIndexOffsets[face][j];
+		data |= (World::Blocks::blockData[blockId].atlasIndex << 17);
+		data |= (j << 25);
+		vertices.push_back(data);
 	}
 
 	// Construct the two triangles
@@ -94,7 +88,7 @@ void AddFace(int blockId, std::vector<Graphics::VertexData>& vertices, std::vect
 }
 
 // Builds all faces for blocks in the interior of the chunk
-void BuildMeshInteriorBlocks(std::vector<Graphics::VertexData>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk) {
+void BuildMeshInteriorBlocks(std::vector<uint32_t>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk) {
 	for (int y = 1; y < World::Chunks::height - 1; y++)
 	for (int x = 1; x < World::Chunks::width - 1; x++)
 	for (int z = 1; z < World::Chunks::width - 1; z++) {
@@ -118,7 +112,7 @@ void BuildMeshInteriorBlocks(std::vector<Graphics::VertexData>& vertices, std::v
 }
 
 // Builds all non-exterior faces for all blocks on the exterior of the chunk
-void BuildMeshExteriorBlocks(std::vector<Graphics::VertexData>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk) {
+void BuildMeshExteriorBlocks(std::vector<uint32_t>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk) {
 	for (const ExteriorBlockBlueprint& blockBlueprint : exteriorBlockBlueprints) {
 		// If this block is air, there's nothing to construct
 		int blockId = chunk.GetBlock(blockBlueprint.thisIndex);
@@ -137,7 +131,7 @@ void BuildMeshExteriorBlocks(std::vector<Graphics::VertexData>& vertices, std::v
 }
 
 // Builds the top or bottom faces of the chunk
-void BuildMeshCap(std::vector<Graphics::VertexData>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk, bool isTop) {
+void BuildMeshCap(std::vector<uint32_t>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk, bool isTop) {
 	int face, y;
 	if (isTop) {
 		face = 5; // Top face
@@ -161,7 +155,7 @@ void BuildMeshCap(std::vector<Graphics::VertexData>& vertices, std::vector<GLuin
 
 // Builds the exterior faces between this chunk and an adjacent chunk
 void BuildMeshExterior(
-	std::vector<Graphics::VertexData>& vertices, std::vector<GLuint>& indices,
+	std::vector<uint32_t>& vertices, std::vector<GLuint>& indices,
 	const World::Chunks::Chunk& chunk, const World::Chunks::Chunk& exteriorChunk,
 	int face
 ) {
@@ -281,7 +275,7 @@ namespace Graphics {
 	}
 
 	ChunkMesh ChunkMesh::BuildChunkMesh(const World::Chunks::Chunk& chunk, const World::Chunks::Chunk* const* neighbors) {
-		std::vector<VertexData> vertices;
+		std::vector<uint32_t> vertices;
 		std::vector<GLuint> indices;
 
 		BuildMeshInteriorBlocks(vertices, indices, chunk);
@@ -296,18 +290,17 @@ namespace Graphics {
 		return ChunkMesh(chunk.position, vertices, indices);
 	}
 
-	ChunkMesh::ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<VertexData>& vertices, const std::vector<GLuint>& indices):
+	ChunkMesh::ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<uint32_t>& vertices, const std::vector<GLuint>& indices):
 		chunkCoord(chunkCoord),
 		vao(),
-		vbo(vertices.size() * sizeof(VertexData), vertices.data()),
+		vbo(vertices.size() * sizeof(uint32_t), vertices.data()),
 		ebo(indices.size() * sizeof(GLuint), indices.data()),
 		indexCount(indices.size())
 	{
 		vao.Bind();
 		vbo.Bind();
 		ebo.Bind();
-		vao.LinkAttribI(vbo, 0, 1, GL_INT, sizeof(GLint) + 2 * sizeof(GLfloat), (void*)0);
-		vao.LinkAttrib(vbo, 1, 2, GL_FLOAT, sizeof(GLint) + 2 * sizeof(GLfloat), (void*)(1 * sizeof(GLint)));
+		vao.LinkAttribI(vbo, 0, 1, GL_INT, sizeof(uint32_t), (void*)0);
 		vao.Unbind();
 		vbo.Unbind();
 		ebo.Unbind();
