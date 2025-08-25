@@ -4,9 +4,9 @@ layout (location = 0) in uint aData;
 
 out vec2 texCoord;
 
-uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform ivec2 chunkCoord;
 
 const uint vertexIndexMask = 0x1FFFF;
 const uint atlasIndexMask = 0xFF << 17;
@@ -30,7 +30,7 @@ void main() {
 	int x = vertexIndex / 17 % 17;
 	int y = vertexIndex / (17 * 17);
 
-	gl_Position = projection * view * model * vec4(x, y, z, 1.0);
+	gl_Position = projection * view * vec4(x + chunkCoord.x * 16, y, z + chunkCoord.y * 16, 1.0);
 
 	// Calculate texture coordinates from atlas index and vertex corner
 	texCoord = vec2(

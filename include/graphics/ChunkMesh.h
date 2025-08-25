@@ -43,7 +43,7 @@ namespace Graphics {
 		// Cannot move assign a ChunkMesh, as it would invalidate indexCount
 		ChunkMesh& operator=(ChunkMesh&&) = delete;
 
-		void Draw() const;
+		void Draw(GLuint chunkCoordUniformLocation) const;
 
 	private:
 		VAO vao;

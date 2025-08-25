@@ -39,7 +39,7 @@ bool isDHeld = false;
 bool isQHeld = false;
 bool isEHeld = false;
 
-constexpr int renderDistance = 50;
+constexpr int renderDistance = 10;
 
 
 // Window resize callback
@@ -264,12 +264,9 @@ int main() {
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
 
-        GLuint modelLocation = glGetUniformLocation(shaderProgram.GetId(), "model");
-
+        GLuint chunkCoordLocation = glGetUniformLocation(shaderProgram.GetId(), "chunkCoord");
         for (const auto& [coord, mesh] : World::Chunks::ChunkManager::meshes) {
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(mesh.chunkCoord.x * World::Chunks::width, 0, mesh.chunkCoord.y * World::Chunks::width));
-			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-			mesh.Draw();
+			mesh.Draw(chunkCoordLocation);
         }
 
         glfwSwapBuffers(window);

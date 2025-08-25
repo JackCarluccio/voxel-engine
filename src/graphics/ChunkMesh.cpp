@@ -300,7 +300,7 @@ namespace Graphics {
 		vao.Bind();
 		vbo.Bind();
 		ebo.Bind();
-		vao.LinkAttribI(vbo, 0, 1, GL_INT, sizeof(uint32_t), (void*)0);
+		vao.LinkAttribI(vbo, 0, 1, GL_UNSIGNED_INT, sizeof(uint32_t), (void*)0);
 		vao.Unbind();
 		vbo.Unbind();
 		ebo.Unbind();
@@ -313,12 +313,17 @@ namespace Graphics {
 	}
 
 
-	void ChunkMesh::Draw() const {
+	void ChunkMesh::Draw(GLuint chunkCoordUniformLocation) const {
+		// Update the chunk coordinate uniform
+		glUniform2i(chunkCoordUniformLocation, chunkCoord.x, chunkCoord.y);
+
+		// Bind the texture atlas
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textureAtlasId);
 
 		vao.Bind();
 		vbo.Bind();
+
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 	}
 
