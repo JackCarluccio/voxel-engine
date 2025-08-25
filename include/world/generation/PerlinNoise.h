@@ -17,8 +17,8 @@ namespace World::Generation::PerlinNoise {
 		float Sample(float x, float y) const noexcept;
 
 	private:
-		const float maxNoise;
 		const float frequency;
+		const float maxNoiseRecip;
 	};
 
 }

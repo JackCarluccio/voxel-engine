@@ -207,7 +207,7 @@ int main() {
     // Hide cursor and lock it to the window. Cursor inputs still work
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	// Enables/Disables VSync. Without VSync, screen tearing can occur, and resource usage is higher
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 
     // Load OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {

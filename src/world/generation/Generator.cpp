@@ -59,6 +59,8 @@ float SampleContinentalness(float x, float z) noexcept {
 	return continentalnessSpline.Sample(noise);
 }
 
+int mapsGenerated = 0;
+double totalTime = 0.0;
 namespace World::Generation::Generator {
 
 	// Generates a chunk at the specified position.
@@ -68,6 +70,8 @@ namespace World::Generation::Generator {
 
 		int chunkWorldX = position.x * Chunks::width;
 		int chunkWorldZ = position.y * Chunks::width;
+
+		//auto start = std::chrono::high_resolution_clock::now();
 
 		// Generate a heightmap which controls the height of the terrain
 		int heightMap[Chunks::area];
@@ -79,9 +83,16 @@ namespace World::Generation::Generator {
 			float weirdness = SampleWeirdness(worldX, worldZ);
 			float continentalness = SampleContinentalness(worldX, worldZ);
 
-			int terrainHeight = 512 * (erosion * weirdness * continentalness);
+			int terrainHeight = 512.0f * (erosion * weirdness * continentalness);
 			heightMap[z + x * Chunks::width] = std::clamp(static_cast<int>(terrainHeight), 2, 250);
 		}
+
+		/*auto end = std::chrono::high_resolution_clock::now();
+		double elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+		totalTime += elapsedTime;
+		mapsGenerated++;
+
+		std::cout << "Map Generation Avg: " << totalTime / mapsGenerated << "us" << std::endl;*/
 
 		// Set each block below the terrain height to stone
 		for (int x = 0; x < Chunks::width; x++)

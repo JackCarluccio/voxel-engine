@@ -10,7 +10,10 @@ bool AttemptMeshCreation(const World::Chunks::Chunk& chunk) {
 	World::Chunks::ChunkManager::meshes.insert({ chunk.position, std::move(mesh) });
 	return true;
 }
- 
+
+double elapsedGenTime = 0, elapsedMeshTime = 0;
+int numChunksGenerated = 0, numMeshesGenerated = 0;
+
 namespace World::Chunks::ChunkManager {
 
 	std::unordered_map<glm::ivec2, Chunk, IVec2Hash, IVec2Equal> chunks;
@@ -49,7 +52,14 @@ namespace World::Chunks::ChunkManager {
 			return false;
 		}
 
+		auto genStart = std::chrono::high_resolution_clock::now();
 		chunks.insert({ chunkCoord, Generation::Generator::GenerateChunk(chunkCoord) });
+		auto genFinish = std::chrono::high_resolution_clock::now();
+		double elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(genFinish - genStart).count();
+		elapsedGenTime += elapsedTime;
+		numChunksGenerated++;
+		std::cout << "Chunk Generation Avg: " << elapsedGenTime / numChunksGenerated << "us" << std::endl;
+
 		Chunk& chunk = chunks[chunkCoord];
 
 		AttemptMeshCreation(chunk);
