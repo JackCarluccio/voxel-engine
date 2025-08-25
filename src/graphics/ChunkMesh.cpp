@@ -1,5 +1,8 @@
 #include "graphics/ChunkMesh.h"
 
+std::vector<uint32_t> scratchVertices;
+std::vector<GLuint> scratchIndices;
+
 // ChunkMesh's vertex measurement properties
 constexpr int vertexWidth = World::Chunks::width + 1;
 constexpr int vertexArea = vertexWidth * vertexWidth;
@@ -266,28 +269,43 @@ void LoadTextureAtlas(const char* textureAtlas, GLuint* textureAtlasIdPtr) {
 	stbi_image_free(data);
 }
 
+double totalMeshTime = 0.0;
+int totalMeshCount = 0;
+
 namespace Graphics {
 
 	void ChunkMesh::Initialize() {
+		scratchVertices.reserve(786432);
+		scratchIndices.reserve(1179648);
+
 		LoadTextureAtlas("../../../assets/texture_atlas.png", &textureAtlasId);
 		PopulateExteriorBlueprints();
 		PopulateExteriorBlockBlueprints();
 	}
 
 	ChunkMesh ChunkMesh::BuildChunkMesh(const World::Chunks::Chunk& chunk, const World::Chunks::Chunk* const* neighbors) {
-		std::vector<uint32_t> vertices;
-		std::vector<GLuint> indices;
+		auto start = std::chrono::high_resolution_clock::now();
 
-		BuildMeshInteriorBlocks(vertices, indices, chunk);
-		BuildMeshExteriorBlocks(vertices, indices, chunk);
-		BuildMeshCap(vertices, indices, chunk, true); // Top of the chunk
-		BuildMeshCap(vertices, indices, chunk, false); // Bottom of the chunk
-		BuildMeshExterior(vertices, indices, chunk, *neighbors[0], 0); // Back face
-		BuildMeshExterior(vertices, indices, chunk, *neighbors[1], 1); // Front face
-		BuildMeshExterior(vertices, indices, chunk, *neighbors[2], 2); // Right face
-		BuildMeshExterior(vertices, indices, chunk, *neighbors[3], 3); // Left face
+		scratchVertices.clear();
+		scratchIndices.clear();
 
-		return ChunkMesh(chunk.position, vertices, indices);
+		BuildMeshInteriorBlocks(scratchVertices, scratchIndices, chunk);
+		BuildMeshExteriorBlocks(scratchVertices, scratchIndices, chunk);
+		BuildMeshCap(scratchVertices, scratchIndices, chunk, true); // Top of the chunk
+		BuildMeshCap(scratchVertices, scratchIndices, chunk, false); // Bottom of the chunk
+		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[0], 0); // Back face
+		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[1], 1); // Front face
+		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[2], 2); // Right face
+		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[3], 3); // Left face
+
+		auto end = std::chrono::high_resolution_clock::now();
+		double timeTaken = std::chrono::duration<double, std::micro>(end - start).count();
+		totalMeshTime += timeTaken;
+		totalMeshCount++;
+
+		std::cout << "Avg Chunk Mesh Time (" << totalMeshCount << "): \t" << (totalMeshTime / totalMeshCount) << "us" << std::endl;
+
+		return ChunkMesh(chunk.coord, scratchVertices, scratchIndices);
 	}
 
 	ChunkMesh::ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<uint32_t>& vertices, const std::vector<GLuint>& indices):

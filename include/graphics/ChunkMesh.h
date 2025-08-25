@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <chrono>
 #include <iostream>
 
 #include "graphics/VAO.h"

@@ -8,7 +8,8 @@ int FindSegmentIndex(const std::vector<SplinePoint>& points, float t) noexcept {
 	// Handle out-of-bounds t values
 	if (t < points[0].t) {
 		return 0;
-	} else if (t >= points.back().t) {
+	}
+	else if (t >= points.back().t) {
 		return points.size() - 2;
 	}
 
@@ -18,11 +19,6 @@ int FindSegmentIndex(const std::vector<SplinePoint>& points, float t) noexcept {
 		if (t <= points[i].t)
 			return i - 1;
 	}
-}
-
-// Comparator for sorting spline points by their t value
-bool SplinePointComparator(const SplinePoint& a, const SplinePoint& b) noexcept {
-	return a.t < b.t;
 }
 
 // Calculates the linear segments between each pair of spline points
@@ -45,18 +41,22 @@ std::vector<LinearSegment> CalculateLinearSegments(const std::vector<SplinePoint
 namespace World::Generation::Splines {
 
 	// Constructs a linear spline from the given points. Sorts points by t value.
-	LinearSpline::LinearSpline(std::vector<SplinePoint>& points) :
-		points(points),
-		segments(CalculateLinearSegments(points))
+	LinearSpline::LinearSpline(std::vector<SplinePoint> points_) :
+		points(std::move(points_))
 	{
-		std::sort(points.begin(), points.end(), SplinePointComparator);
+		assert(points.size() >= 2 && "A spline must have at least two points.");
+
+		std::sort(points.begin(), points.end(),
+			[](const SplinePoint& a, const SplinePoint& b) { return a.t < b.t; });
+
+		segments = CalculateLinearSegments(points);
 	}
 
 	// Samples the spline at the specified t value
 	float LinearSpline::Sample(float t) const noexcept {
 		int segmentIndex = FindSegmentIndex(points, t);
 		const LinearSegment& segment = segments[segmentIndex];
-		return segment.slope * t + segment.intercept;
+		return std::fma(segment.slope, t, segment.intercept);
 	}
 
 	// Calculates the first derivative (slope) at the specified t value.

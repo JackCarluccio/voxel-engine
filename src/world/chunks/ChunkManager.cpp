@@ -2,17 +2,14 @@
 
 bool AttemptMeshCreation(const World::Chunks::Chunk& chunk) {
 	// All neighbors must exist to construct a mesh
-	if (!World::Chunks::ChunkManager::HasAllNeighbors(chunk.position))
+	if (!World::Chunks::ChunkManager::HasAllNeighbors(chunk.coord))
 		return false;
 
-	std::array<World::Chunks::Chunk*, 4> neighbors = World::Chunks::ChunkManager::GetNeighbors(chunk.position);
+	std::array<World::Chunks::Chunk*, 4> neighbors = World::Chunks::ChunkManager::GetNeighbors(chunk.coord);
 	Graphics::ChunkMesh mesh = Graphics::ChunkMesh::BuildChunkMesh(chunk, neighbors.data());
-	World::Chunks::ChunkManager::meshes.insert({ chunk.position, std::move(mesh) });
+	World::Chunks::ChunkManager::meshes.insert({ chunk.coord, std::move(mesh) });
 	return true;
 }
-
-double elapsedGenTime = 0, elapsedMeshTime = 0;
-int numChunksGenerated = 0, numMeshesGenerated = 0;
 
 namespace World::Chunks::ChunkManager {
 
@@ -52,14 +49,7 @@ namespace World::Chunks::ChunkManager {
 			return false;
 		}
 
-		auto genStart = std::chrono::high_resolution_clock::now();
 		chunks.insert({ chunkCoord, Generation::Generator::GenerateChunk(chunkCoord) });
-		auto genFinish = std::chrono::high_resolution_clock::now();
-		double elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(genFinish - genStart).count();
-		elapsedGenTime += elapsedTime;
-		numChunksGenerated++;
-		std::cout << "Chunk Generation Avg: " << elapsedGenTime / numChunksGenerated << "us" << std::endl;
-
 		Chunk& chunk = chunks[chunkCoord];
 
 		AttemptMeshCreation(chunk);

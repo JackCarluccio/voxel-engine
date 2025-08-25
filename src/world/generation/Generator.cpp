@@ -65,16 +65,15 @@ namespace World::Generation::Generator {
 
 	// Generates a chunk at the specified position.
 	// Includes chunk data, meshing, and meshing neighbors.
-	Chunks::Chunk GenerateChunk(const glm::ivec2& position) {
-		Chunks::Chunk chunk(position);
+	Chunks::Chunk GenerateChunk(const glm::ivec2& coord) {
+		Chunks::Chunk chunk(coord);
 
-		int chunkWorldX = position.x * Chunks::width;
-		int chunkWorldZ = position.y * Chunks::width;
-
-		//auto start = std::chrono::high_resolution_clock::now();
+		int chunkWorldX = coord.x * Chunks::width;
+		int chunkWorldZ = coord.y * Chunks::width;
 
 		// Generate a heightmap which controls the height of the terrain
 		int heightMap[Chunks::area];
+		int minHeight = 256;
 		for (int x = 0; x < Chunks::width; x++)
 		for (int z = 0; z < Chunks::width; z++) {
 			int worldX = x + chunkWorldX;
@@ -84,15 +83,15 @@ namespace World::Generation::Generator {
 			float continentalness = SampleContinentalness(worldX, worldZ);
 
 			int terrainHeight = 512.0f * (erosion * weirdness * continentalness);
-			heightMap[z + x * Chunks::width] = std::clamp(static_cast<int>(terrainHeight), 2, 250);
+			heightMap[z + x * Chunks::width] = std::clamp(static_cast<int>(terrainHeight), 8, 250);
+
+			if (terrainHeight < minHeight) {
+				minHeight = terrainHeight;
+			}
 		}
 
-		/*auto end = std::chrono::high_resolution_clock::now();
-		double elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-		totalTime += elapsedTime;
-		mapsGenerated++;
-
-		std::cout << "Map Generation Avg: " << totalTime / mapsGenerated << "us" << std::endl;*/
+		// Fill the entire chunk with stone up to the minimum terrain height
+		std::memset(chunk.blocks.data(), Blocks::STONE, static_cast<size_t>(minHeight * Chunks::area));
 
 		// Set each block below the terrain height to stone
 		for (int x = 0; x < Chunks::width; x++)
@@ -100,17 +99,15 @@ namespace World::Generation::Generator {
 			int height = heightMap[z + x * Chunks::width];
 
 			// Set surface block
-			if (height > 0) {
-				chunk.SetBlock(x, height - 1, z, Blocks::GRASS);
-			}
+			chunk.SetBlock(x, height, z, Blocks::GRASS);
 			
 			// Set subsurface blocks
-			for (int y = height - 4; y < height - 1; y++) {
+			for (int y = height - 3; y < height; y++) {
 				chunk.SetBlock(x, y, z, Blocks::DIRT);
 			}
 
 			// Set all stone blocks
-			for (int y = 0; y < height - 4; y++) {
+			for (int y = minHeight + 1; y < height - 3; y++) {
 				chunk.SetBlock(x, y, z, Blocks::STONE);
 			}
 		}

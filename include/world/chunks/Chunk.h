@@ -1,9 +1,9 @@
 #pragma once
 
+#include <vector>
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
-#include <vector>
 
 namespace World::Chunks {
 
@@ -62,22 +62,23 @@ namespace World::Chunks {
 	class Chunk {
 	public:
 
-		const glm::ivec2 position;
+		const glm::ivec2 coord;
 		std::vector<uint8_t> blocks;
 
-		Chunk(const glm::ivec2& p) : position(p), blocks(volume) {};
-		Chunk() : position(glm::ivec2(0, 0)), blocks(volume) { };
+		Chunk(const glm::ivec2& coord_) : coord(coord_), blocks(volume) {};
+		Chunk(const glm::ivec2& coord_, std::vector<uint8_t>& data) :
+			coord(coord_), blocks(std::move(data))
+		{};
+		Chunk() : coord(glm::ivec2(0, 0)) { };
 
 		// Disable copying.
 		Chunk(const Chunk&) = delete;
 		Chunk& operator=(const Chunk&) = delete;
 
 		Chunk(Chunk&& other) noexcept :
-			position(other.position),
+			coord(other.coord),
 			blocks(std::move(other.blocks))
-		{
-			other.blocks.clear(); // Clear the moved-from chunk's blocks
-		}
+		{}
 		Chunk& operator=(Chunk&&) = delete;
 
 		// GetBlock methods

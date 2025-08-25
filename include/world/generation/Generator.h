@@ -1,8 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <chrono>
-#include <iostream>
 #include <algorithm>
 
 #include <glm/glm.hpp>
@@ -16,6 +14,6 @@ namespace World::Generation::Generator {
 
 	constexpr int surfaceLevel = 0;
 
-	Chunks::Chunk GenerateChunk(const glm::ivec2& position);
+	Chunks::Chunk GenerateChunk(const glm::ivec2& coord);
 
 }

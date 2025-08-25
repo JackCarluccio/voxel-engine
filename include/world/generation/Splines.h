@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cmath>
 #include <vector>
+#include <cassert>
 #include <algorithm>
 
 namespace World::Generation::Splines {
@@ -15,7 +17,7 @@ namespace World::Generation::Splines {
 
 	class LinearSpline {
 	public:
-		LinearSpline(std::vector<SplinePoint>& points);
+		LinearSpline(std::vector<SplinePoint> points_);
 
 		// Allow default copy constructors and assignment operators
 		LinearSpline(const LinearSpline&) = default;
