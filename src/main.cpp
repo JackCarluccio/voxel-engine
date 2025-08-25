@@ -39,7 +39,7 @@ bool isDHeld = false;
 bool isQHeld = false;
 bool isEHeld = false;
 
-constexpr int renderDistance = 10;
+constexpr int renderDistance = 50;
 
 
 // Window resize callback

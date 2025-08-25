@@ -1,10 +1,13 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <vector>
 #include <algorithm>
+
+#include <glm/glm.hpp>
 
 #include "world/chunks/Chunk.h"
 #include "world/blocks/Blocks.h"
+#include "world/generation/Splines.h"
 #include "world/generation/PerlinNoise.h"
 
 namespace World::Generation::Generator {

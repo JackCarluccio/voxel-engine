@@ -50,7 +50,7 @@ add_executable(VoxelEngine
     "src/world/chunks/ChunkManager.cpp"
     "src/world/generation/Generator.cpp"
     "src/world/generation/PerlinNoise.cpp"
-)
+    "src/world/generation/Splines.cpp")
 
 # Include directories
 target_include_directories(VoxelEngine 

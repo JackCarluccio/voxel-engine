@@ -12,12 +12,13 @@ namespace World::Generation::PerlinNoise {
 		const float lacunarity;
 		const float persistence;
 
-		PerlinNoise2d(int octaves, float lacunarity, float persistence);
+		PerlinNoise2d(float frequency, int octaves, float lacunarity, float persistence);
 
 		float Sample(float x, float y) const noexcept;
 
 	private:
 		const float maxNoise;
+		const float frequency;
 	};
 
 }

@@ -12,6 +12,13 @@ const uint vertexIndexMask = 0x1FFFF;
 const uint atlasIndexMask = 0xFF << 17;
 const uint cornerMask = 0x3 << 25;
 
+const vec2 cornerAtlasOffsets[4] = vec2[](
+	vec2(0.0000, 0.0625),
+	vec2(0.0625, 0.0625),
+	vec2(0.0625, 0.0000),
+	vec2(0.0000, 0.0000)
+);
+
 void main() {
 	// Unpack vertexIndex, atlasIndex, and corner from aData
 	int vertexIndex = int(aData & vertexIndexMask);
@@ -25,18 +32,9 @@ void main() {
 
 	gl_Position = projection * view * model * vec4(x, y, z, 1.0);
 
-	float u = float(atlasIndex % 16) / 16.0;
-	float v = float(atlasIndex / 16) / 16.0;
-	if (corner == 0) {
-		v += 0.0625;
-	} else if (corner == 1) {
-		u += 0.0625;
-		v += 0.0625;
-	} else if (corner == 2) {
-		u += 0.0625;
-	} else {
-
-	}
-
-	texCoord = vec2(u, v);
+	// Calculate texture coordinates from atlas index and vertex corner
+	texCoord = vec2(
+		float(atlasIndex % 16) / 16.0 + cornerAtlasOffsets[corner].x,
+		float(atlasIndex / 16) / 16.0 + cornerAtlasOffsets[corner].y
+	);
 }

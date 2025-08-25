@@ -84,20 +84,20 @@ namespace World::Generation::PerlinNoise {
 	}
 
 	// Creates a PerlinNoise2d instance with the specified parameters
-	PerlinNoise2d::PerlinNoise2d(int octaves, float lacunarity, float persistence) :
-		octaves(octaves), lacunarity(lacunarity), persistence(persistence),
+	PerlinNoise2d::PerlinNoise2d(float frequency, int octaves, float lacunarity, float persistence) :
+		frequency(frequency), octaves(octaves), lacunarity(lacunarity), persistence(persistence),
 		maxNoise(GetMaxNoise(octaves, persistence))
 	{}
 
 	// Samples the perlin noise at the specified coordinates. Layers multiple octaves together
 	float PerlinNoise2d::Sample(float x, float y) const noexcept {
 		float total = 0.0f;
-		float frequency = 1.0f;
-		float amplitude = 1.0f;
+		float thisFrequency = frequency;
+		float thisAmplitude = 1.0f;
 		for (int i = 0; i < octaves; i++) {
-			total += Sample2d(x * frequency, y * frequency) * amplitude;
-			frequency *= lacunarity;
-			amplitude *= persistence;
+			total += Sample2d(x * thisFrequency, y * thisFrequency) * thisAmplitude;
+			thisFrequency *= lacunarity;
+			thisAmplitude *= persistence;
 		}
 
 		return total / maxNoise;
