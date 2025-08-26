@@ -17,8 +17,8 @@ namespace World::Blocks {
 		SANDSTONE,
 		SNOW,
 		ICE,
-		COBBLESTONE,
 		BEDROCK,
+		COBBLESTONE,
 	};
 
 	extern BlockData blockData[256];

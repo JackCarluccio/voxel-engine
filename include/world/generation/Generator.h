@@ -7,6 +7,7 @@
 
 #include "world/chunks/Chunk.h"
 #include "world/blocks/Blocks.h"
+#include "world/biomes/Biomes.h"
 #include "world/generation/Splines.h"
 #include "world/generation/PerlinNoise.h"
 

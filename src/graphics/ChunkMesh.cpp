@@ -284,8 +284,6 @@ namespace Graphics {
 	}
 
 	ChunkMesh ChunkMesh::BuildChunkMesh(const World::Chunks::Chunk& chunk, const World::Chunks::Chunk* const* neighbors) {
-		auto start = std::chrono::high_resolution_clock::now();
-
 		scratchVertices.clear();
 		scratchIndices.clear();
 
@@ -297,13 +295,6 @@ namespace Graphics {
 		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[1], 1); // Front face
 		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[2], 2); // Right face
 		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[3], 3); // Left face
-
-		auto end = std::chrono::high_resolution_clock::now();
-		double timeTaken = std::chrono::duration<double, std::micro>(end - start).count();
-		totalMeshTime += timeTaken;
-		totalMeshCount++;
-
-		std::cout << "Avg Chunk Mesh Time (" << totalMeshCount << "): \t" << (totalMeshTime / totalMeshCount) << "us" << std::endl;
 
 		return ChunkMesh(chunk.coord, scratchVertices, scratchIndices);
 	}

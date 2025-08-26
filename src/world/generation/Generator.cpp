@@ -8,6 +8,8 @@ constexpr float continentalnessFrequency = 1.0f / 128.0f;
 PerlinNoise::PerlinNoise2d erosionNoise(erosionFrequency, 3, 2.0f, 0.5f);
 PerlinNoise::PerlinNoise2d weirdnessNoise(weirdnessFrequency, 4, 2.0f, 0.5f);
 PerlinNoise::PerlinNoise2d continentalnessNoise(continentalnessFrequency, 4, 2.0f, 0.5f);
+PerlinNoise::PerlinNoise2d temperatureNoise(1.0f / 256.0f, 1, 2.0f, 0.5f);
+PerlinNoise::PerlinNoise2d humidityNoise(1.0f / 256.0f, 1, 2.0f, 0.5f);
 
 std::vector<Splines::SplinePoint> erosionPoints = {
 	{ -1.000f, 1.000f },
@@ -71,6 +73,13 @@ namespace World::Generation::Generator {
 		int chunkWorldX = coord.x * Chunks::width;
 		int chunkWorldZ = coord.y * Chunks::width;
 
+		float humidity = humidityNoise.Sample(chunkWorldX, chunkWorldZ);
+		float temperature = temperatureNoise.Sample(chunkWorldX, chunkWorldZ);
+
+		Biomes::Biome biome = Biomes::DetermineBiome(temperature, humidity);
+		Blocks::BlockType surfaceBlock = Biomes::biomeData[biome].surfaceBlock;
+		Blocks::BlockType subsurfaceBlock = Biomes::biomeData[biome].subsurfaceBlock;
+
 		// Generate a heightmap which controls the height of the terrain
 		int heightMap[Chunks::area];
 		int minHeight = 256;
@@ -83,7 +92,7 @@ namespace World::Generation::Generator {
 			float continentalness = SampleContinentalness(worldX, worldZ);
 
 			int terrainHeight = 512.0f * (erosion * weirdness * continentalness);
-			heightMap[z + x * Chunks::width] = std::clamp(static_cast<int>(terrainHeight), 8, 250);
+			heightMap[z + x * Chunks::width] = std::clamp(static_cast<int>(terrainHeight), 5, 255);
 
 			if (terrainHeight < minHeight) {
 				minHeight = terrainHeight;
@@ -99,11 +108,11 @@ namespace World::Generation::Generator {
 			int height = heightMap[z + x * Chunks::width];
 
 			// Set surface block
-			chunk.SetBlock(x, height, z, Blocks::GRASS);
+			chunk.SetBlock(x, height, z, surfaceBlock);
 			
 			// Set subsurface blocks
 			for (int y = height - 3; y < height; y++) {
-				chunk.SetBlock(x, y, z, Blocks::DIRT);
+				chunk.SetBlock(x, y, z, subsurfaceBlock);
 			}
 
 			// Set all stone blocks
