@@ -11,6 +11,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "graphics/Camera.h"
 #include "graphics/ShaderProgram.h"
 #include "graphics/ChunkMesh.h"
 #include "world/chunks/Chunk.h"
@@ -22,15 +23,7 @@ struct ChunkInfo {
     Graphics::ChunkMesh mesh;
 };
 
-float aspectRatio = 1920.0f / 1080.0f;
-
-glm::vec3 cameraPosition = glm::vec3(0.0f, 128.0f, 0.0f);
-glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-//glm::mat4 model = glm::mat4(1.0f);
-glm::mat4 view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
-glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 5000.0f);
+Graphics::Camera camera(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 5000.0f);
 
 bool isWHeld = false;
 bool isSHeld = false;
@@ -39,15 +32,13 @@ bool isDHeld = false;
 bool isQHeld = false;
 bool isEHeld = false;
 
-constexpr int renderDistance = 25;
+constexpr int renderDistance = 10;
 
 
 // Window resize callback
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
-
-	aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-	projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 5000.0f);
+	camera.SetAspectRatio(static_cast<float>(width) / static_cast<float>(height));
 }
 
 bool firstMouse = true;
@@ -64,24 +55,23 @@ void WindowFocusCallback(GLFWwindow* window, int focused) {
 
 // Update camera position and rotation from key and mouse inputs
 double lastMouseX = 0.0f, lastMouseY = 0.0f;
-float cameraYaw = 0.0f;
-float cameraPitch = 0.0f;
 void UpdateCamera(float deltaTime) {
     // Handle keyboard movement
-    glm::vec3 right = glm::normalize(glm::cross(cameraDirection, cameraUp));
-    glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    const glm::vec3 right = camera.transform[0];
+    const glm::vec3 forward = camera.transform[2];
+    const glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    glm::vec3 moveDirection(0.0f);
-    if (isAHeld) moveDirection -= right;
-    if (isDHeld) moveDirection += right;
-    if (isQHeld) moveDirection -= worldUp;
-    if (isEHeld) moveDirection += worldUp;
-    if (isWHeld) moveDirection += cameraDirection;
-    if (isSHeld) moveDirection -= cameraDirection;
+    glm::vec3 moveLocal(0.0f);
+    if (isAHeld) moveLocal.x -= 1.0f;
+    if (isDHeld) moveLocal.x += 1.0f;
+    if (isQHeld) moveLocal.y -= 1.0f;
+    if (isEHeld) moveLocal.y += 1.0f;
+    if (isWHeld) moveLocal.z += 1.0f;
+    if (isSHeld) moveLocal.z -= 1.0f;
 
-    if (glm::length(moveDirection) > 0.0f) {
-        moveDirection = glm::normalize(moveDirection);
-        cameraPosition += moveDirection * deltaTime * 8.0f;
+    if (glm::length(moveLocal) > 0.0f) {
+        moveLocal = glm::normalize(moveLocal) * (deltaTime * 8.0f);
+        camera.transform = glm::translate(camera.transform, moveLocal);
     }
 
     // Handle mouse rotation
@@ -95,30 +85,41 @@ void UpdateCamera(float deltaTime) {
     }
 
     // Calculate mouse movement sensitivity
-    float sensitivity = 0.1f;
-    float xOffset = static_cast<float>(mouseX - lastMouseX) * sensitivity;
-    float yOffset = static_cast<float>(lastMouseY - mouseY) * sensitivity; // Reversed for y-coordinates
+    float sensitivity = 0.005f;
+    float xOffset = static_cast<float>(lastMouseX - mouseX) * sensitivity;
+    float yOffset = static_cast<float>(mouseY - lastMouseY) * sensitivity; // Reversed for y-coordinates
 
     lastMouseX = mouseX;
     lastMouseY = mouseY;
 
+	float yaw = atan2(forward.x, forward.z);
+	float pitch = asin(-forward.y);
+
     // Update camera orientation
-    cameraYaw += xOffset;
-    cameraPitch += yOffset;
+    yaw += xOffset;
+    pitch += yOffset;
 
     // Prevent looking too far up or down
-    if (cameraPitch > 89.0f) cameraPitch = 89.0f;
-    if (cameraPitch < -89.0f) cameraPitch = -89.0f;
+    if (pitch > 89.0f) pitch = 89.0f;
+    if (pitch < -89.0f) pitch = -89.0f;
 
-    // Calculate new direction vector
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(cameraYaw)) * cos(glm::radians(cameraPitch));
-    direction.y = sin(glm::radians(cameraPitch));
-    direction.z = sin(glm::radians(cameraYaw)) * cos(glm::radians(cameraPitch));
-    cameraDirection = glm::normalize(direction);
+    // Calculate new direction vectors from yaw and pitch
+    glm::vec3 newForward;
+    newForward.x = sin(yaw) * cos(pitch);
+    newForward.y = -sin(pitch);
+    newForward.z = cos(yaw) * cos(pitch);
+    newForward = glm::normalize(newForward);
 
-    // Rebuild view matrix
-    view = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, worldUp);
+    // Calculate right and up vectors
+    glm::vec3 newRight = glm::normalize(glm::cross(newForward, worldUp));
+    glm::vec3 newUp = glm::normalize(glm::cross(newRight, newForward));
+
+    // Update the camera transform matrix (preserve position)
+    glm::vec3 position = camera.transform[3];
+    camera.transform[0] = glm::vec4(newRight, 0.0f);
+    camera.transform[1] = glm::vec4(newUp, 0.0f);
+    camera.transform[2] = glm::vec4(newForward, 0.0f);
+    camera.transform[3] = glm::vec4(position, 1.0f);
 }
 
 // Key callback function to handle key inputs. Stores state of keys.
@@ -257,6 +258,9 @@ int main() {
 
         shaderProgram.Activate();
         glUniform1i(glGetUniformLocation(shaderProgram.GetId(), "textureAtlas"), 0);
+
+		const glm::mat4 view = camera.GetViewMatrix();
+		const glm::mat4 projection = camera.GetProjectionMatrix();
 
         // Update camera and projection matrices once per frame
         GLuint viewLocation = glGetUniformLocation(shaderProgram.GetId(), "view");

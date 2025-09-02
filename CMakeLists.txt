@@ -40,17 +40,21 @@ find_package(OpenGL REQUIRED)
 # Add executable
 add_executable(VoxelEngine 
     src/main.cpp
+
+    "src/graphics/Camera.cpp"
     "src/graphics/ShaderProgram.cpp"
     "src/graphics/VAO.cpp"
     "src/graphics/VBO.cpp"
     "src/graphics/EBO.cpp"
     "src/graphics/ChunkMesh.cpp"
     
+    "src/world/biomes/Biomes.cpp"
     "src/world/blocks/Blocks.cpp"
     "src/world/chunks/ChunkManager.cpp"
     "src/world/generation/Generator.cpp"
     "src/world/generation/PerlinNoise.cpp"
-    "src/world/generation/Splines.cpp" "include/world/biomes/Biomes.h" "src/world/biomes/Biomes.cpp")
+    "src/world/generation/Splines.cpp"
+)
 
 # Include directories
 target_include_directories(VoxelEngine 

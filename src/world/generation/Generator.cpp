@@ -61,8 +61,28 @@ float SampleContinentalness(float x, float z) noexcept {
 	return continentalnessSpline.Sample(noise);
 }
 
-int mapsGenerated = 0;
-double totalTime = 0.0;
+int GenerateHeightMap(int* heightMap, int chunkWorldX, int chunkWorldZ) noexcept {
+	int minHeight = 256;
+
+	for (int x = 0; x < World::Chunks::width; x++)
+	for (int z = 0; z < World::Chunks::width; z++) {
+		int worldX = x + chunkWorldX;
+		int worldZ = z + chunkWorldZ;
+		float erosion = SampleErosion(worldX, worldZ);
+		float weirdness = SampleWeirdness(worldX, worldZ);
+		float continentalness = SampleContinentalness(worldX, worldZ);
+
+		int terrainHeight = 512.0f * (erosion * weirdness * continentalness);
+		heightMap[z + x * World::Chunks::width] = std::clamp(static_cast<int>(terrainHeight), 5, 255);
+
+		if (terrainHeight < minHeight) {
+			minHeight = terrainHeight;
+		}
+	}
+
+	return minHeight;
+}
+
 namespace World::Generation::Generator {
 
 	// Generates a chunk at the specified position.
@@ -82,25 +102,10 @@ namespace World::Generation::Generator {
 
 		// Generate a heightmap which controls the height of the terrain
 		int heightMap[Chunks::area];
-		int minHeight = 256;
-		for (int x = 0; x < Chunks::width; x++)
-		for (int z = 0; z < Chunks::width; z++) {
-			int worldX = x + chunkWorldX;
-			int worldZ = z + chunkWorldZ;
-			float erosion = SampleErosion(worldX, worldZ);
-			float weirdness = SampleWeirdness(worldX, worldZ);
-			float continentalness = SampleContinentalness(worldX, worldZ);
-
-			int terrainHeight = 512.0f * (erosion * weirdness * continentalness);
-			heightMap[z + x * Chunks::width] = std::clamp(static_cast<int>(terrainHeight), 5, 255);
-
-			if (terrainHeight < minHeight) {
-				minHeight = terrainHeight;
-			}
-		}
+		int minHeight = GenerateHeightMap(&heightMap[0], chunkWorldX, chunkWorldZ);
 
 		// Fill the entire chunk with stone up to the minimum terrain height
-		std::memset(chunk.blocks.data(), Blocks::STONE, static_cast<size_t>(minHeight * Chunks::area));
+		std::memset(chunk.blocks.data(), Blocks::STONE, static_cast<size_t>((minHeight + 1) * Chunks::area));
 
 		// Set each block below the terrain height to stone
 		for (int x = 0; x < Chunks::width; x++)
