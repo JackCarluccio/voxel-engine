@@ -27,7 +27,7 @@ namespace Graphics {
 		// Builds the ChunkMesh for the chunk
 		static ChunkMesh BuildChunkMesh(const World::Chunks::Chunk& chunk, const World::Chunks::Chunk* const* neighbors);
 
-		ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<uint32_t>& vertices, const std::vector<GLuint>& indices);
+		ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<uint32_t>& vertices, const std::vector<uint16_t>& indices);
 		~ChunkMesh();
 
 		// Disable copy constructors. Since VAOs, VBOs, and EBOs cannot be copied, neither can a mesh.

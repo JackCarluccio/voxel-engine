@@ -1,7 +1,7 @@
 #include "graphics/ChunkMesh.h"
 
 std::vector<uint32_t> scratchVertices;
-std::vector<GLuint> scratchIndices;
+std::vector<uint16_t> scratchIndices;
 
 // ChunkMesh's vertex measurement properties
 constexpr int vertexWidth = World::Chunks::width + 1;
@@ -71,7 +71,7 @@ ExteriorBlockBlueprint exteriorBlockBlueprints[World::Chunks::exteriorVolume];
 ExteriorBlueprint exteriorBlueprints[4][World::Chunks::width * World::Chunks::height];
 
 // Constructs the triangles for a face of a block
-void AddFace(int blockId, std::vector<uint32_t>& vertices, std::vector<GLuint>& indices, int face, int vertexIndexOrigin) {
+void AddFace(int blockId, std::vector<uint32_t>& vertices, std::vector<uint16_t>& indices, int face, int vertexIndexOrigin) {
 	// Add each vertex
 	for (int j = 0; j < 4; j++) {
 		uint32_t data = vertexIndexOrigin + faceVertexIndexOffsets[face][j];
@@ -81,7 +81,7 @@ void AddFace(int blockId, std::vector<uint32_t>& vertices, std::vector<GLuint>& 
 	}
 
 	// Construct the two triangles
-	int indexOffset = vertices.size() - 4;
+	uint16_t indexOffset = vertices.size() - 4;
 	indices.push_back(indexOffset + 0);
 	indices.push_back(indexOffset + 1);
 	indices.push_back(indexOffset + 2);
@@ -91,7 +91,7 @@ void AddFace(int blockId, std::vector<uint32_t>& vertices, std::vector<GLuint>& 
 }
 
 // Builds all faces for blocks in the interior of the chunk
-void BuildMeshInteriorBlocks(std::vector<uint32_t>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk) {
+void BuildMeshInteriorBlocks(std::vector<uint32_t>& vertices, std::vector<uint16_t>& indices, const World::Chunks::Chunk& chunk) {
 	for (int y = 1; y < World::Chunks::height - 1; y++)
 	for (int x = 1; x < World::Chunks::width - 1; x++)
 	for (int z = 1; z < World::Chunks::width - 1; z++) {
@@ -115,7 +115,7 @@ void BuildMeshInteriorBlocks(std::vector<uint32_t>& vertices, std::vector<GLuint
 }
 
 // Builds all non-exterior faces for all blocks on the exterior of the chunk
-void BuildMeshExteriorBlocks(std::vector<uint32_t>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk) {
+void BuildMeshExteriorBlocks(std::vector<uint32_t>& vertices, std::vector<uint16_t>& indices, const World::Chunks::Chunk& chunk) {
 	for (const ExteriorBlockBlueprint& blockBlueprint : exteriorBlockBlueprints) {
 		// If this block is air, there's nothing to construct
 		int blockId = chunk.GetBlock(blockBlueprint.thisIndex);
@@ -134,7 +134,7 @@ void BuildMeshExteriorBlocks(std::vector<uint32_t>& vertices, std::vector<GLuint
 }
 
 // Builds the top or bottom faces of the chunk
-void BuildMeshCap(std::vector<uint32_t>& vertices, std::vector<GLuint>& indices, const World::Chunks::Chunk& chunk, bool isTop) {
+void BuildMeshCap(std::vector<uint32_t>& vertices, std::vector<uint16_t>& indices, const World::Chunks::Chunk& chunk, bool isTop) {
 	int face, y;
 	if (isTop) {
 		face = 5; // Top face
@@ -158,7 +158,7 @@ void BuildMeshCap(std::vector<uint32_t>& vertices, std::vector<GLuint>& indices,
 
 // Builds the exterior faces between this chunk and an adjacent chunk
 void BuildMeshExterior(
-	std::vector<uint32_t>& vertices, std::vector<GLuint>& indices,
+	std::vector<uint32_t>& vertices, std::vector<uint16_t>& indices,
 	const World::Chunks::Chunk& chunk, const World::Chunks::Chunk& exteriorChunk,
 	int face
 ) {
@@ -272,8 +272,8 @@ void LoadTextureAtlas(const char* textureAtlas, GLuint* textureAtlasIdPtr) {
 namespace Graphics {
 
 	void ChunkMesh::Initialize() {
-		scratchVertices.reserve(786432);
-		scratchIndices.reserve(1179648);
+		scratchVertices.reserve(43691);
+		scratchIndices.reserve(65536);
 
 		LoadTextureAtlas("../../../assets/texture_atlas.png", &textureAtlasId);
 		PopulateExteriorBlueprints();
@@ -296,11 +296,11 @@ namespace Graphics {
 		return ChunkMesh(chunk.coord, scratchVertices, scratchIndices);
 	}
 
-	ChunkMesh::ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<uint32_t>& vertices, const std::vector<GLuint>& indices):
+	ChunkMesh::ChunkMesh(const glm::ivec2& chunkCoord, const std::vector<uint32_t>& vertices, const std::vector<uint16_t>& indices):
 		chunkCoord(chunkCoord),
 		vao(),
 		vbo(vertices.size() * sizeof(uint32_t), vertices.data()),
-		ebo(indices.size() * sizeof(GLuint), indices.data()),
+		ebo(indices.size() * sizeof(uint16_t), indices.data()),
 		indexCount(indices.size())
 	{
 		vao.Bind();
@@ -330,7 +330,7 @@ namespace Graphics {
 		vao.Bind();
 		vbo.Bind();
 
-		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, nullptr);
 	}
 
 }
