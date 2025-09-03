@@ -57,7 +57,7 @@ add_executable(VoxelEngine
 
     
     
-  "src/engine/Input.cpp")
+  "src/engine/Input.cpp" "include/graphics/Window.h" "src/graphics/Window.cpp")
 
 # Include directories
 target_include_directories(VoxelEngine 

@@ -12,17 +12,13 @@
 #include <unordered_map>
 
 #include "engine/Input.h"
+#include "graphics/Window.h"
 #include "graphics/Camera.h"
 #include "graphics/ShaderProgram.h"
 #include "graphics/ChunkMesh.h"
 #include "world/chunks/Chunk.h"
 #include "world/chunks/ChunkManager.h"
 #include "world/generation/Generator.h"
-
-struct ChunkInfo {
-    World::Chunks::Chunk chunk;
-    Graphics::ChunkMesh mesh;
-};
 
 Graphics::Camera camera(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 5000.0f);
 
@@ -93,7 +89,7 @@ void UpdateCamera(float deltaTime) {
     camera.transform[3] = glm::vec4(position, 1.0f);
 }
 
-// Key callback function to handle key inputs. Stores state of keys.
+// Key callback function to handle key inputs
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         Engine::Input::onKeyDown.emit(static_cast<Engine::Input::Key>(key));
@@ -103,44 +99,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 int main() {
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
-    }
 
-	// Force OpenGL 4.6 Core Profile to avoid compatibility issues
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    Graphics::Window window("Voxel Engine", false);
 
-    // Set relevant window hints before creating the window.
-    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-    // Create a borderless window, not fullscreen. Fullscreen causes many issues
-    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-
-    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "Voxel Engine", nullptr, nullptr);
-    if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwSetWindowPos(window, 0, 0);
-    glfwMakeContextCurrent(window);
-
-	// Reset cursor position and key states when the window changes focus
-    glfwSetWindowFocusCallback(window, WindowFocusCallback);
-	// Update OpenGL's viewport and adjust the projection matrix when the window is resized
-    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-
-    // Hide cursor and lock it to the window. Cursor inputs still work
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	// Enables/Disables VSync. Without VSync, screen tearing can occur, and resource usage is higher
-	//glfwSwapInterval(0);
+	window.setKeyCallback(KeyCallback);
+	window.setWindowFocusCallback(WindowFocusCallback);
+	window.setFramebufferSizeCallback(FramebufferSizeCallback);
 
     // Load OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -150,14 +114,14 @@ int main() {
 
     // Only render triangles if they appear CCW
     glEnable(GL_CULL_FACE);
-	glCullFace(GL_CCW);
+	glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 
     // Make sure triangles don't render over each other
     glEnable(GL_DEPTH_TEST);
 
+	Engine::Input::start();
     Graphics::ChunkMesh::Initialize();
-
-	glfwSetKeyCallback(window, KeyCallback);
 
     // Create and use shader program
 	Graphics::ShaderProgram shaderProgram("chunk_mesh_vert.glsl", "chunk_mesh_frag.glsl");
@@ -167,13 +131,11 @@ int main() {
         World::Chunks::ChunkManager::CreateChunk(glm::ivec2(x, z));
     }
 
-	Engine::Input::start();
-
     int frameCount = 0;
 	std::chrono::steady_clock::time_point lastFrameTime = std::chrono::steady_clock::now();
 
     // Main loop
-    while (!glfwWindowShouldClose(window)) {
+    while (!window.shouldClose()) {
         // Calculate delta time
         frameCount++;
 		std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
@@ -208,11 +170,9 @@ int main() {
 			mesh.Draw(chunkCoordLocation);
         }
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        window.swapBuffers();
+        window.pollEvents();
     }
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
     return 0;
 }
