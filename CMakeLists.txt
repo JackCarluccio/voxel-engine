@@ -54,7 +54,10 @@ add_executable(VoxelEngine
     "src/world/generation/Generator.cpp"
     "src/world/generation/PerlinNoise.cpp"
     "src/world/generation/Splines.cpp"
-)
+
+    
+    
+  "src/engine/Input.cpp")
 
 # Include directories
 target_include_directories(VoxelEngine 

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "engine/Input.h"
 #include "graphics/Camera.h"
 #include "graphics/ShaderProgram.h"
 #include "graphics/ChunkMesh.h"
@@ -25,15 +26,7 @@ struct ChunkInfo {
 
 Graphics::Camera camera(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 5000.0f);
 
-bool isWHeld = false;
-bool isSHeld = false;
-bool isAHeld = false;
-bool isDHeld = false;
-bool isQHeld = false;
-bool isEHeld = false;
-
 constexpr int renderDistance = 10;
-
 
 // Window resize callback
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -41,20 +34,15 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	camera.SetAspectRatio(static_cast<float>(width) / static_cast<float>(height));
 }
 
-bool firstMouse = true;
 void WindowFocusCallback(GLFWwindow* window, int focused) {
     if (focused) {
-        // Window gained focus
-        firstMouse = true;  // Reset mouse tracking when returning to window
+        Engine::Input::onFocusGained.emit();
     } else {
-        // Window lost focus
-        // Release all held keys to prevent getting stuck
-        isWHeld = isSHeld = isAHeld = isDHeld = isQHeld = isEHeld = false;
+        Engine::Input::onFocusLost.emit();
     }
 }
 
 // Update camera position and rotation from key and mouse inputs
-double lastMouseX = 0.0f, lastMouseY = 0.0f;
 void UpdateCamera(float deltaTime) {
     // Handle keyboard movement
     const glm::vec3 right = camera.transform[0];
@@ -62,42 +50,25 @@ void UpdateCamera(float deltaTime) {
     const glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
     glm::vec3 moveLocal(0.0f);
-    if (isAHeld) moveLocal.x -= 1.0f;
-    if (isDHeld) moveLocal.x += 1.0f;
-    if (isQHeld) moveLocal.y -= 1.0f;
-    if (isEHeld) moveLocal.y += 1.0f;
-    if (isWHeld) moveLocal.z += 1.0f;
-    if (isSHeld) moveLocal.z -= 1.0f;
+    if (Engine::Input::isKeyHeld(Engine::Input::KEY_A)) moveLocal.x -= 1.0f;
+    if (Engine::Input::isKeyHeld(Engine::Input::KEY_D)) moveLocal.x += 1.0f;
+    if (Engine::Input::isKeyHeld(Engine::Input::KEY_Q)) moveLocal.y -= 1.0f;
+    if (Engine::Input::isKeyHeld(Engine::Input::KEY_E)) moveLocal.y += 1.0f;
+    if (Engine::Input::isKeyHeld(Engine::Input::KEY_W)) moveLocal.z += 1.0f;
+    if (Engine::Input::isKeyHeld(Engine::Input::KEY_S)) moveLocal.z -= 1.0f;
 
     if (glm::length(moveLocal) > 0.0f) {
-        moveLocal = glm::normalize(moveLocal) * (deltaTime * 8.0f);
+        moveLocal = glm::normalize(moveLocal) * (deltaTime * 32.0f);
         camera.transform = glm::translate(camera.transform, moveLocal);
     }
-
-    // Handle mouse rotation
-    double mouseX, mouseY;
-    glfwGetCursorPos(glfwGetCurrentContext(), &mouseX, &mouseY);
-
-    if (firstMouse) {
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-        firstMouse = false;
-    }
-
-    // Calculate mouse movement sensitivity
-    float sensitivity = 0.005f;
-    float xOffset = static_cast<float>(lastMouseX - mouseX) * sensitivity;
-    float yOffset = static_cast<float>(mouseY - lastMouseY) * sensitivity; // Reversed for y-coordinates
-
-    lastMouseX = mouseX;
-    lastMouseY = mouseY;
 
 	float yaw = atan2(forward.x, forward.z);
 	float pitch = asin(-forward.y);
 
     // Update camera orientation
-    yaw += xOffset;
-    pitch += yOffset;
+	const auto mouseDelta = Engine::Input::getMouseDelta();
+    yaw += -mouseDelta.x * 0.0025f;
+    pitch += mouseDelta.y * 0.0025f;
 
     // Prevent looking too far up or down
     if (pitch > 89.0f) pitch = 89.0f;
@@ -124,49 +95,10 @@ void UpdateCamera(float deltaTime) {
 
 // Key callback function to handle key inputs. Stores state of keys.
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    switch (key) {
-    case GLFW_KEY_W:
-        if (action == GLFW_PRESS) {
-            isWHeld = true;
-        } else if (action == GLFW_RELEASE) {
-            isWHeld = false;
-        }
-        break;
-    case GLFW_KEY_S:
-        if (action == GLFW_PRESS) {
-            isSHeld = true;
-        } else if (action == GLFW_RELEASE) {
-            isSHeld = false;
-        }
-        break;
-    case GLFW_KEY_A:
-		if (action == GLFW_PRESS) {
-			isAHeld = true;
-		} else if (action == GLFW_RELEASE) {
-			isAHeld = false;
-		}
-		break;
-	case GLFW_KEY_D:
-        if (action == GLFW_PRESS) {
-            isDHeld = true;
-		} else if (action == GLFW_RELEASE) {
-            isDHeld = false;
-        }
-        break;
-    case GLFW_KEY_Q:
-        if (action == GLFW_PRESS) {
-            isQHeld = true;
-        } else if (action == GLFW_RELEASE) {
-			isQHeld = false;
-		}
-		break;
-    case GLFW_KEY_E:
-		if (action == GLFW_PRESS) {
-			isEHeld = true;
-		} else if (action == GLFW_RELEASE) {
-			isEHeld = false;
-		}
-		break;
+    if (action == GLFW_PRESS) {
+        Engine::Input::onKeyDown.emit(static_cast<Engine::Input::Key>(key));
+    } else if (action == GLFW_RELEASE) {
+        Engine::Input::onKeyUp.emit(static_cast<Engine::Input::Key>(key));
     }
 }
 
@@ -208,7 +140,7 @@ int main() {
     // Hide cursor and lock it to the window. Cursor inputs still work
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	// Enables/Disables VSync. Without VSync, screen tearing can occur, and resource usage is higher
-	glfwSwapInterval(0);
+	//glfwSwapInterval(0);
 
     // Load OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -235,6 +167,8 @@ int main() {
         World::Chunks::ChunkManager::CreateChunk(glm::ivec2(x, z));
     }
 
+	Engine::Input::start();
+
     int frameCount = 0;
 	std::chrono::steady_clock::time_point lastFrameTime = std::chrono::steady_clock::now();
 
@@ -253,8 +187,9 @@ int main() {
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        Engine::Input::update();
+
         UpdateCamera(deltaTime);
-        firstMouse = false;
 
         shaderProgram.Activate();
         glUniform1i(glGetUniformLocation(shaderProgram.GetId(), "textureAtlas"), 0);
