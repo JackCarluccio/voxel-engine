@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
 #include <iostream>
@@ -9,6 +10,7 @@
 #include "graphics/VAO.h"
 #include "graphics/VBO.h"
 #include "graphics/EBO.h"
+#include "graphics/ShaderProgram.h"
 #include "graphics/stb_image.h"
 
 #include "world/blocks/Blocks.h"

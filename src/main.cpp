@@ -13,6 +13,7 @@
 
 #include "engine/Input.h"
 #include "graphics/Window.h"
+#include "graphics/Renderer.h"
 #include "graphics/Camera.h"
 #include "graphics/ShaderProgram.h"
 #include "graphics/ChunkMesh.h"
@@ -101,24 +102,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 int main() {
 
     Graphics::Window window("Voxel Engine", false);
+    Graphics::Renderer::start();
 
 	window.setKeyCallback(KeyCallback);
 	window.setWindowFocusCallback(WindowFocusCallback);
 	window.setFramebufferSizeCallback(FramebufferSizeCallback);
-
-    // Load OpenGL function pointers
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize OpenGL loader!" << std::endl;
-        return -1;
-    }
-
-    // Only render triangles if they appear CCW
-    glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
-
-    // Make sure triangles don't render over each other
-    glEnable(GL_DEPTH_TEST);
 
 	Engine::Input::start();
     Graphics::ChunkMesh::Initialize();
@@ -131,27 +119,12 @@ int main() {
         World::Chunks::ChunkManager::CreateChunk(glm::ivec2(x, z));
     }
 
-    int frameCount = 0;
-	std::chrono::steady_clock::time_point lastFrameTime = std::chrono::steady_clock::now();
+    Graphics::Renderer::onPreRender.connect(UpdateCamera);
 
     // Main loop
     while (!window.shouldClose()) {
-        // Calculate delta time
-        frameCount++;
-		std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-		float deltaTime = std::chrono::duration<float>(currentTime - lastFrameTime).count();
-		lastFrameTime = currentTime;
-
-		if (frameCount % 60 == 0) {
-			std::cout << "FPS: " << (1.0f / deltaTime) << std::endl;
-		}
-
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         Engine::Input::update();
-
-        UpdateCamera(deltaTime);
+		Graphics::Renderer::render();
 
         shaderProgram.Activate();
         glUniform1i(glGetUniformLocation(shaderProgram.GetId(), "textureAtlas"), 0);

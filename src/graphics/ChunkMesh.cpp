@@ -269,9 +269,6 @@ void LoadTextureAtlas(const char* textureAtlas, GLuint* textureAtlasIdPtr) {
 	stbi_image_free(data);
 }
 
-double totalMeshTime = 0.0;
-int totalMeshCount = 0;
-
 namespace Graphics {
 
 	void ChunkMesh::Initialize() {
