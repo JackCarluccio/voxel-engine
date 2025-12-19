@@ -275,7 +275,7 @@ namespace Graphics {
 		scratchVertices.reserve(43691);
 		scratchIndices.reserve(65536);
 
-		LoadTextureAtlas("../../../assets/texture_atlas.png", &textureAtlasId);
+		LoadTextureAtlas("assets/texture_atlas.png", &textureAtlasId);
 		PopulateExteriorBlueprints();
 		PopulateExteriorBlockBlueprints();
 	}

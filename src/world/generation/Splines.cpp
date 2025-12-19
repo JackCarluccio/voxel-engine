@@ -8,8 +8,7 @@ int FindSegmentIndex(const std::vector<SplinePoint>& points, float t) noexcept {
 	// Handle out-of-bounds t values
 	if (t < points[0].t) {
 		return 0;
-	}
-	else if (t >= points.back().t) {
+	} else if (t >= points.back().t) {
 		return points.size() - 2;
 	}
 
@@ -19,6 +18,8 @@ int FindSegmentIndex(const std::vector<SplinePoint>& points, float t) noexcept {
 		if (t <= points[i].t)
 			return i - 1;
 	}
+
+	return points.size() - 2; // Fallback, should not reach here
 }
 
 // Calculates the linear segments between each pair of spline points

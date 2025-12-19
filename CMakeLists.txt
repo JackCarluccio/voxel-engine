@@ -18,14 +18,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
-# Download GLAD
-FetchContent_Declare(
-    glad
-    GIT_REPOSITORY https://github.com/Dav1dde/glad.git
-    GIT_TAG v0.1.36
-)
-FetchContent_MakeAvailable(glad)
-
 # Download GLM
 FetchContent_Declare(
     glm
@@ -33,6 +25,15 @@ FetchContent_Declare(
     GIT_TAG master
 )
 FetchContent_MakeAvailable(glm)
+
+# Local GLAD (vendored)
+add_library(glad STATIC
+    external/glad/src/gl.c
+)
+
+target_include_directories(glad PUBLIC
+    external/glad/include
+)
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)
@@ -63,8 +64,8 @@ add_executable(VoxelEngine
 target_include_directories(VoxelEngine 
     PRIVATE 
     ${CMAKE_SOURCE_DIR}/include
-    ${glfw_SOURCE_DIR}/include 
-    ${glad_SOURCE_DIR}/include
+    ${glfw_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/external/glad/include
 )
 
 # Link libraries
@@ -74,4 +75,16 @@ target_link_libraries(VoxelEngine
     glfw 
     glad 
     glm
+)
+
+add_custom_command(TARGET VoxelEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/assets
+            $<TARGET_FILE_DIR:VoxelEngine>/assets
+)
+
+add_custom_command(TARGET VoxelEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/shaders
+            $<TARGET_FILE_DIR:VoxelEngine>/shaders
 )

@@ -7,7 +7,7 @@ namespace Graphics::Renderer {
 
 	void start() {
 		// Load OpenGL function pointers
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		if (!gladLoadGL(glfwGetProcAddress)) {
 			std::cerr << "Failed to initialize OpenGL loader!" << std::endl;
 			return;
 		}

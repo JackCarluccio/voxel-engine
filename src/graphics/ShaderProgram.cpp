@@ -1,7 +1,7 @@
-#include "graphics/shaderProgram.h"
+#include "graphics/ShaderProgram.h"
 
 std::string ReadFile(const std::string& fileName) {
-	std::ifstream file("../../../shaders/" + fileName);
+	std::ifstream file("shaders/" + fileName);
 	if (!file) {
 		std::cerr << "Error opening shader source file: " << fileName << std::endl;
 		return "";
