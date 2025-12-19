@@ -287,7 +287,7 @@ namespace Graphics {
 		BuildMeshInteriorBlocks(scratchVertices, scratchIndices, chunk);
 		BuildMeshExteriorBlocks(scratchVertices, scratchIndices, chunk);
 		BuildMeshCap(scratchVertices, scratchIndices, chunk, true); // Top of the chunk
-		BuildMeshCap(scratchVertices, scratchIndices, chunk, false); // Bottom of the chunk
+		// BuildMeshCap(scratchVertices, scratchIndices, chunk, false); // Bottom of the chunk
 		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[0], 0); // Back face
 		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[1], 1); // Front face
 		BuildMeshExterior(scratchVertices, scratchIndices, chunk, *neighbors[2], 2); // Right face

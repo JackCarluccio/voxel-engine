@@ -15,20 +15,15 @@
 #include "graphics/Window.h"
 #include "graphics/Renderer.h"
 #include "graphics/Camera.h"
-#include "graphics/ShaderProgram.h"
 #include "graphics/ChunkMesh.h"
-#include "world/chunks/Chunk.h"
 #include "world/chunks/ChunkManager.h"
-#include "world/generation/Generator.h"
-
-Graphics::Camera camera(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 5000.0f);
 
 constexpr int renderDistance = 10;
 
 // Window resize callback
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
-	camera.SetAspectRatio(static_cast<float>(width) / static_cast<float>(height));
+	Graphics::Renderer::camera.SetAspectRatio(static_cast<float>(width) / static_cast<float>(height));
 }
 
 void WindowFocusCallback(GLFWwindow* window, int focused) {
@@ -41,6 +36,8 @@ void WindowFocusCallback(GLFWwindow* window, int focused) {
 
 // Update camera position and rotation from key and mouse inputs
 void UpdateCamera(float deltaTime) {
+    Graphics::Camera& camera = Graphics::Renderer::camera;
+
     // Handle keyboard movement
     const glm::vec3 right = camera.transform[0];
     const glm::vec3 forward = camera.transform[2];
@@ -100,7 +97,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 int main() {
-
     Graphics::Window window("Voxel Engine", false);
     Graphics::Renderer::start();
 
@@ -110,9 +106,6 @@ int main() {
 
 	Engine::Input::start();
     Graphics::ChunkMesh::Initialize();
-
-    // Create and use shader program
-	Graphics::ShaderProgram shaderProgram("chunk_mesh_vert.glsl", "chunk_mesh_frag.glsl");
 
     for (int x = -renderDistance; x <= renderDistance; x++)
     for (int z = -renderDistance; z <= renderDistance; z++) {
@@ -125,23 +118,6 @@ int main() {
     while (!window.shouldClose()) {
         Engine::Input::update();
 		Graphics::Renderer::render();
-
-        shaderProgram.Activate();
-        glUniform1i(glGetUniformLocation(shaderProgram.GetId(), "textureAtlas"), 0);
-
-		const glm::mat4 view = camera.GetViewMatrix();
-		const glm::mat4 projection = camera.GetProjectionMatrix();
-
-        // Update camera and projection matrices once per frame
-        GLuint viewLocation = glGetUniformLocation(shaderProgram.GetId(), "view");
-        GLuint projectionLocation = glGetUniformLocation(shaderProgram.GetId(), "projection");
-        glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
-
-        GLuint chunkCoordLocation = glGetUniformLocation(shaderProgram.GetId(), "chunkCoord");
-        for (const auto& [coord, mesh] : World::Chunks::ChunkManager::meshes) {
-			mesh.Draw(chunkCoordLocation);
-        }
 
         window.swapBuffers();
         window.pollEvents();
