@@ -17,8 +17,11 @@
 #include "graphics/Camera.h"
 #include "graphics/ChunkMesh.h"
 #include "world/chunks/ChunkManager.h"
+#include "world/chunks/ChunkScheduler.h"
 
-constexpr int renderDistance = 10;
+#include "util/IndexableMinHeap.h"
+
+constexpr int renderDistance = 50;
 
 // Window resize callback
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -109,7 +112,7 @@ int main() {
 
     for (int x = -renderDistance; x <= renderDistance; x++)
     for (int z = -renderDistance; z <= renderDistance; z++) {
-        World::Chunks::ChunkManager::CreateChunk(glm::ivec2(x, z));
+        World::Chunks::ChunkScheduler::schedule(glm::ivec2(x, z));
     }
 
     Graphics::Renderer::onPreRender.connect(UpdateCamera);
@@ -118,6 +121,12 @@ int main() {
     while (!window.shouldClose()) {
         Engine::Input::update();
 		Graphics::Renderer::render();
+
+        bool hasNext = World::Chunks::ChunkScheduler::hasNextChunkToGenerate();
+        if (hasNext) {
+            glm::ivec2 chunkPos = World::Chunks::ChunkScheduler::getNextChunkToGenerate();
+            World::Chunks::ChunkManager::CreateChunk(chunkPos);
+        }
 
         window.swapBuffers();
         window.pollEvents();

@@ -13,8 +13,8 @@ bool AttemptMeshCreation(const World::Chunks::Chunk& chunk) {
 
 namespace World::Chunks::ChunkManager {
 
-	std::unordered_map<glm::ivec2, Chunk, IVec2Hash, IVec2Equal> chunks;
-	std::unordered_map<glm::ivec2, Graphics::ChunkMesh, IVec2Hash, IVec2Equal> meshes;
+	std::unordered_map<glm::ivec2, Chunk, Util::IVec2Hash, Util::IVec2Equal> chunks;
+	std::unordered_map<glm::ivec2, Graphics::ChunkMesh, Util::IVec2Hash, Util::IVec2Equal> meshes;
 
 	// Checks if a chunk has all 4 neighbors loaded
 	bool HasAllNeighbors(const glm::ivec2& chunkCoord) noexcept {
