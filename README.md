@@ -15,6 +15,11 @@ This project implements a custom rendering pipeline to handle large-scale, chunk
 * **Procedural Rendering:** Optimized face-culling to ensure only visible surfaces are sent to the GPU.
 * **GLSL Shaders:** Custom vertex and fragment shaders for transformations and texture mapping.
 
+## How to Play
+* **WASD**: Move forward, left, backwards, and right respectively with the WASD keys
+* **QE**: Move down and up respectively with the QE keys
+* **Mouse Movement**: Change where you look by moving the mouse
+
 ## 🏗 Build Instructions
 
 This project uses **CMake**. Ensure you have a C++ compiler.
