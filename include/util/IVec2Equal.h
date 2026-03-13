@@ -5,7 +5,7 @@
 namespace Util {
 
     struct IVec2Equal {
-        bool operator()(const glm::ivec2& a, const glm::ivec2& b) const {
+        bool operator()(const glm::ivec2& a, const glm::ivec2& b) const noexcept {
             return a.x == b.x && a.y == b.y;
         }
     };

@@ -5,7 +5,7 @@
 namespace Util {
 
     struct IVec2Hash {
-        std::size_t operator()(const glm::ivec2& vec) const {
+        std::size_t operator()(const glm::ivec2& vec) const noexcept {
             return std::hash<int>()(vec.x) ^ std::hash<int>()(vec.y);
         }
     };

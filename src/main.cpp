@@ -1,4 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -21,7 +22,7 @@
 
 #include "util/IndexableMinHeap.h"
 
-constexpr int renderDistance = 50;
+constexpr int renderDistance = 25;
 
 // Window resize callback
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
